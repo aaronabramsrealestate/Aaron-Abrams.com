@@ -19,7 +19,7 @@
     coast:   { name: 'North County Coast',    color: '#e2725b', blurb: 'Beach cities from Del Mar to Oceanside, linked by I-5 and the Coaster train.' },
     inland:  { name: 'North County Inland',   color: '#7f9d5a', blurb: 'Foothill and valley communities along SR-78, SR-76 and I-15, from Rancho Santa Fe and Poway to Fallbrook.' },
     central: { name: 'Central San Diego',     color: '#5668b3', blurb: 'The urban core and the neighborhoods around Downtown, Balboa Park and Mission Valley.' },
-    beach:   { name: 'Beach and Bay',         color: '#2b8a8f', blurb: 'Ocean and bayfront neighborhoods from La Jolla south to Point Loma.' },
+    beach:   { name: 'Beach and Bay',         color: '#2596be', blurb: 'Ocean and bayfront neighborhoods from La Jolla south to Point Loma.' },
     north:   { name: 'North City and Inland', color: '#d99a2b', blurb: 'The north side of the City of San Diego, from University City to Rancho Bernardo.' }
   };
   var ORDER = ['coast', 'inland', 'central', 'beach', 'north'];

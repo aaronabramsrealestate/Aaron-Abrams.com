@@ -13,7 +13,7 @@
  */
 
 const FUB_URL = 'https://api.followupboss.com/v1/events';
-const SOURCE = 'aaron-abrams.com';
+const SOURCE = 'aaronabrams.com';
 const SYSTEM = 'AaronAbrams-Website';
 
 function clean(v) {

@@ -19,10 +19,10 @@ PAGES
   faq.html, contact.html, home-value.html, thank-you.html, 404.html
 
 STILL TO CONFIRM OR SUPPLY BEFORE LAUNCH
-  1. Domain. Every page currently points at https://aaron-abrams.com (canonical tags,
+  1. Domain. Every page currently points at https://aaronabrams.com (canonical tags,
      social share tags, sitemap.xml, robots.txt, and the Follow Up Boss lead source in
      netlify/functions/submission-created.mjs). If the real domain is different,
-     find and replace "aaron-abrams.com" across the repo.
+     find and replace "aaronabrams.com" across the repo.
   2. Photos and logo. images/aaron-abrams-portrait.jpg, images/aaron-abrams-logo-light.png,
      and images/aaron-abrams-logo-dark.png are placeholders. Replace them with the real
      files using the same names. images/og-image.jpg (the link preview image) and the
@@ -54,7 +54,7 @@ CONNECT FOLLOW UP BOSS
    Key: FUB_API_KEY     Value: paste the key. Save.
 3. Deploys > Trigger deploy > Deploy site (so the key takes effect).
 4. Test by submitting the contact form on the live site. Within a minute a new lead
-   should appear in Follow Up Boss with the source "aaron-abrams.com". If not, check
+   should appear in Follow Up Boss with the source "aaronabrams.com". If not, check
    Netlify > Logs > Functions > submission-created for the error message.
 
 HOW LEADS FLOW
