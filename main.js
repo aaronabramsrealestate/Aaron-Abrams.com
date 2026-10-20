@@ -25,6 +25,8 @@
 //   open_calendar      a "Schedule a Consultation" style button was clicked
 //   click_call, click_text, click_email, click_zillow
 window.__track=function(name,params){ if(window.gtag) window.gtag('event',name,params||{}); };
+// The lead forms, found by name: Netlify removes data-netlify from the HTML it serves.
+var LEAD_FORMS='form[name="contact"],form[name="home-value"]';
 (function(){
   var track=window.__track;
   document.addEventListener('click',function(e){
@@ -37,12 +39,12 @@ window.__track=function(name,params){ if(window.gtag) window.gtag('event',name,p
     else if(/zillow\.com/.test(h)) track('click_zillow',where);
   },true);
   document.addEventListener('submit',function(e){
-    var f=e.target; if(!f.hasAttribute||!f.hasAttribute('data-netlify')||f.__tracked) return;
+    var f=e.target; if(!f.matches||!f.matches(LEAD_FORMS)||f.__tracked) return;
     f.__tracked=true;
     var i=f.querySelector('[name="interest"]');
     track('generate_lead',{form_name:f.getAttribute('name'),interest:i?i.value:''});
   },true);
-  window.addEventListener('pageshow',function(){ document.querySelectorAll('form[data-netlify]').forEach(function(f){ f.__tracked=false; }); });
+  window.addEventListener('pageshow',function(){ document.querySelectorAll(LEAD_FORMS).forEach(function(f){ f.__tracked=false; }); });
   // Calendly tells the page when a meeting is booked
   window.addEventListener('message',function(e){
     if(e.origin!=='https://calendly.com'||!e.data||e.data.event!=='calendly.event_scheduled') return;
@@ -323,7 +325,7 @@ window.__track=function(name,params){ if(window.gtag) window.gtag('event',name,p
 // Lead forms: once a submit is on its way, a second click does not send the lead twice.
 // The button shows that it is sending, and resets if the visitor comes back with the back button.
 (function(){
-  document.querySelectorAll('form[data-netlify]').forEach(function(f){
+  document.querySelectorAll(LEAD_FORMS).forEach(function(f){
     var b=f.querySelector('[type="submit"]'); if(!b) return;
     var label=b.textContent;
     f.addEventListener('submit',function(e){
