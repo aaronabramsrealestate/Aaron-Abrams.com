@@ -39,3 +39,10 @@
 # splits the same page across two internal-link targets.
 [build.processing.html]
   pretty_urls = false
+
+# Internal notes in the repository root are not part of the website.
+[[redirects]]
+  from = "/AUDIT.md"
+  to = "/404.html"
+  status = 404
+  force = true
