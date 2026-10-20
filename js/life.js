@@ -526,7 +526,7 @@
       return { e: b, x: +b.getAttribute('data-x'), y: +b.getAttribute('data-y'), s: +b.getAttribute('data-s'), v: 1.6 + i * 0.5, ph: i * 1.7 };
     });
     // kayaker
-    var kg = el('g', {}, g), kay = { x: 820, y: 650 };
+    var kg = el('g', {}, g), kay = { x: 520, y: 650, dir: 1 };
     el('ellipse', { cx: 0, cy: 0, rx: 17, ry: 2.6, fill: '#e8734a' }, kg);
     var kp = new Person(kg, { shirt: '#e8e2d0', hat: '#2a3550' });
     var paddle = el('g', {}, kp.up);
@@ -534,10 +534,10 @@
     el('ellipse', { cx: -17, cy: -11, rx: 3.4, ry: 1.7, fill: '#2596be' }, paddle);
     el('ellipse', { cx: 17, cy: -11, rx: 3.4, ry: 1.7, fill: '#2596be' }, paddle);
     // a stand-up paddleboarder and a second kayak
-    var sup = el('g', {}, g), supP = new Person(sup, { shirt: '#e8734a', pants: '#10182a' }), sx = 1180;
+    var sup = el('g', {}, g), supP = new Person(sup, { shirt: '#e8734a', pants: '#10182a' }), sx = 700, sdir = -1;
     el('ellipse', { cx: 0, cy: 0, rx: 20, ry: 2.2, fill: '#e8e2d0' }, sup);
     var supPaddle = el('line', { x1: 7, y1: -28, x2: 10, y2: 4, stroke: '#2a2a3a', 'stroke-width': 1.6 }, supP.up);
-    var kg2 = el('g', {}, g), kx2 = 380;
+    var kg2 = el('g', {}, g), kx2 = 380, kdir2 = 1;
     el('ellipse', { cx: 0, cy: 0, rx: 17, ry: 2.6, fill: '#ffd84a' }, kg2);
     var kp2 = new Person(kg2, { shirt: '#2596be', hat: '#e8e2d0' });
     var paddle2 = el('g', {}, kp2.up);
@@ -565,19 +565,19 @@
         b.e.setAttribute('opacity', f1(a));
       });
       // kayak: glides left to right, paddle dips on each side
-      kay.x += 7 * dt; if (kay.x > 1500) kay.x = -60;
+      kay.x += kay.dir * 7 * dt; if (kay.x > 820) kay.dir = -1; if (kay.x < 60) kay.dir = 1;
       var sw = Math.sin(t * 3.2);
-      kg.setAttribute('transform', 'translate(' + f1(kay.x) + ' ' + f1(kay.y + Math.sin(t * 1.2) * 1.2) + ') scale(1.5)');
+      kg.setAttribute('transform', 'translate(' + f1(kay.x) + ' ' + f1(kay.y + Math.sin(t * 1.2) * 1.2) + ') scale(' + f1(1.5 * kay.dir) + ' 1.5)');
       kp.pose({ lean: 3, legA: -86, legB: -82, armA: -40, armB: -40 });
       kp.g.setAttribute('transform', 'translate(-1 9)');
       paddle.setAttribute('transform', 'rotate(' + f1(sw * 22) + ' 0 -11)');
-      sx -= 5 * dt; if (sx < -60) sx = 1500;
-      sup.setAttribute('transform', 'translate(' + f1(sx) + ' ' + f1(690 + Math.sin(t * 1.1) * 1.1) + ') scale(1.5)');
+      sx += sdir * 5 * dt; if (sx > 800) sdir = -1; if (sx < 90) sdir = 1;
+      sup.setAttribute('transform', 'translate(' + f1(sx) + ' ' + f1(690 + Math.sin(t * 1.1) * 1.1) + ') scale(' + f1(1.5 * sdir) + ' 1.5)');
       supP.pose({ lean: 4, legA: -10, legB: 12, armA: -30 + Math.sin(t * 2.4) * 8, armB: -50 });
       supP.g.setAttribute('transform', 'translate(0 -1)');
       supPaddle.setAttribute('transform', 'rotate(' + f1(Math.sin(t * 2.4) * 9) + ' 7 -28)');
-      kx2 += 6 * dt; if (kx2 > 1500) kx2 = -60;
-      kg2.setAttribute('transform', 'translate(' + f1(kx2) + ' ' + f1(612 + Math.sin(t * 1.3 + 1) * 1.1) + ') scale(1.2)');
+      kx2 += kdir2 * 6 * dt; if (kx2 > 760) kdir2 = -1; if (kx2 < 50) kdir2 = 1;
+      kg2.setAttribute('transform', 'translate(' + f1(kx2) + ' ' + f1(612 + Math.sin(t * 1.3 + 1) * 1.1) + ') scale(' + f1(1.2 * kdir2) + ' 1.2)');
       kp2.pose({ lean: 3, legA: -86, legB: -82, armA: -40, armB: -40 }); kp2.g.setAttribute('transform', 'translate(-1 9)');
       paddle2.setAttribute('transform', 'rotate(' + f1(Math.sin(t * 3.4 + 2) * 22) + ' 0 -11)');
       folks.forEach(function (f) {

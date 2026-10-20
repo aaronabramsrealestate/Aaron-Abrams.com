@@ -11,7 +11,8 @@ PAGES
   index.html            Home
   about.html            About Aaron
   buy.html, sell.html   Buyer and seller process
-  properties.html       Listings, selected past sales, home search (placeholders until real content exists)
+  properties.html       Current listing, recent sales, and home search (IDX pending)
+  sales.html            Full sales and transactions page with Zillow reviews
   investment.html       Investment and property potential
   neighborhoods.html    Interactive map and all community guides (one page per community)
   resources.html        Practical guides
@@ -30,8 +31,11 @@ STILL TO CONFIRM OR SUPPLY BEFORE LAUNCH
   3. Scheduling link. "Schedule a Consultation" buttons go to the form on contact.html.
      If you want a booking calendar (for example Calendly), add the link and ask for the
      buttons to be switched over.
-  4. Reviews and past sales. Only add testimonials and transactions that are verified and
-     used with permission. Confirm photo permissions for any listing images.
+  4. Sales, listings and reviews. sales.html, properties.html, the homepage "Recently closed" section,
+     and reviews.html were built from Aaron's public Zillow profile (the current listing and the 5
+     most recent of the 20 sales Zillow reports, plus 4 review excerpts). Photos are linked from
+     Zillow and credited to the listing brokerages. To refresh or add older sales, ask Claude, or
+     send the addresses. Confirm photo permissions for any listing images.
   5. MLS / IDX. properties.html says a search will be added once an approved MLS/IDX
      service is connected. Update it when that happens.
   6. Brokerage disclosures and branding. Confirm the footer text and any team branding
