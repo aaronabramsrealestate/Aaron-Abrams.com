@@ -71,7 +71,7 @@
     });
     return p;
   }
-  function url(u){ return u+(u.indexOf('?')<0?'?':'&')+'hide_gdpr_banner=1&primary_color=e2725b&utm_source=website'; }
+  function url(u){ return u+(u.indexOf('?')<0?'?':'&')+'hide_gdpr_banner=1&primary_color=1a7699&utm_source=website'; }
   var opener=null, pushed=false, wasOpen=false;
   document.addEventListener('click',function(e){
     var a=e.target.closest('[data-calendly]'); if(!a) return;
