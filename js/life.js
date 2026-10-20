@@ -604,6 +604,9 @@
   function encinitas() {
     var cars = scene.querySelector('#cars'), glow = scene.querySelector('#carglow');
     var VX = 880, VY = 566, ZMAX = 15;
+    // Calm, evenly spaced traffic: every car in a lane moves at the same pace, so none can catch up
+    // and overlap, and a car only re-enters when the one before it has left a clear gap.
+    var ZNEAR = 2.2, GAP = 2.1, PACE = 0.45, CARSCALE = 2.0;
     var PAL = [['#1d2a44', '#141d33'], ['#6b7280', '#4b5260'], ['#e8e4da', '#bdb8aa'], ['#8c2f39', '#5f1f27'],
                ['#1f5f6b', '#164650'], ['#2a2a32', '#1a1a20'], ['#c7a35a', '#8f7236'], ['#2596be', '#1a6f8f']];
     function body(b, d, t) {
@@ -639,22 +642,31 @@
     function reroll(c) {
       var col = pick(PAL), tall = Math.random() < 0.3 ? 9 : 0;
       c.g.innerHTML = c.dir > 0 ? away(col, tall) : toward(col, tall);
-      c.v = c.dir > 0 ? rnd(0.7, 1.05) : rnd(0.85, 1.25);
-      c.z = c.dir > 0 ? 1.5 : ZMAX;
+      c.v = c.dir > 0 ? 0.85 : 0.95;
+      c.z = c.dir > 0 ? ZNEAR : ZMAX;
+      c.hold = true;                                         // waits off screen until the lane has room
+    }
+    function laneFree(c) {
+      return list.every(function (o) {
+        if (o === c || o.dir !== c.dir || o.hold) return true;
+        return c.dir > 0 ? o.z >= ZNEAR * GAP : o.z <= ZMAX / GAP;
+      });
     }
     function place(c) {
-      var z = c.z, u = 1 / z, y = VY + 334 * u, x = VX + (c.dir > 0 ? 1 : -1) * (6 + 334 * u), sc = 3.5 * u, a;
-      if (c.dir > 0) a = clamp((ZMAX - z) / 6, 0, 1) * clamp((z - 1.5) / 0.5, 0, 1);
-      else a = clamp((ZMAX - z) / 4, 0, 1) * clamp((z - 1.3) / 0.5, 0, 1);
+      var z = c.z, u = 1 / z, y = VY + 334 * u, x = VX + (c.dir > 0 ? 1 : -1) * (6 + 334 * u), sc = CARSCALE * u, a;
+      if (c.hold) a = 0;
+      else if (c.dir > 0) a = clamp((ZMAX - z) / 6, 0, 1) * clamp((z - ZNEAR) / 0.5, 0, 1);
+      else a = clamp((ZMAX - z) / 4, 0, 1) * clamp((z - ZNEAR) / 0.5, 0, 1);
       var tf = 'translate(' + f1(x) + ' ' + f1(y) + ') scale(' + sc.toFixed(3) + ')';
       c.g.setAttribute('transform', tf); c.gl.setAttribute('transform', tf);
       c.g.style.opacity = a.toFixed(2); c.gl.style.opacity = (a * 0.9).toFixed(2);
     }
     var list = [], n = SMALL ? 2 : 3, i;
+    var START = SMALL ? [3.4, 8.2] : [2.8, 6.0, 12.5];     // starting depths, each about 2x the one before
     for (i = 0; i < n; i++) {
       var c1 = mkCar(1), c2 = mkCar(-1);
-      c1.z = 2.4 + i * (ZMAX - 3.5) / n + rnd(0, 1.5);
-      c2.z = ZMAX - 1 - i * (ZMAX - 3) / n - rnd(0, 1.5);
+      c1.z = START[i]; c2.z = START[n - 1 - i] + 0.6;
+      c1.hold = c2.hold = false;
       list.push(c1, c2); place(c1); place(c2);
     }
     // pedestrians on the sidewalks, shrinking into the distance (u runs from near to far)
@@ -663,7 +675,7 @@
       p.side = Math.random() < 0.5 ? -1 : 1;
       p.dir = Math.random() < 0.5 ? 1 : -1;               // 1: walking away from us
       p.u = first ? rnd(0.12, 0.5) : (p.dir > 0 ? 0.52 : 0.1);
-      p.v = rnd(0.012, 0.022);
+      p.v = rnd(0.010, 0.017);
       p.surf = Math.random() < 0.16;                         // someone carrying a surfboard
       p.p.g.setAttribute('class', '');
       p.board.setAttribute('opacity', p.surf ? 1 : 0);
@@ -687,9 +699,10 @@
     var neonTexts = neon ? [].slice.call(neon.parentNode.querySelectorAll('text')) : [];
     upd.push(function (t, dt) {
       list.forEach(function (c) {
-        c.z += (c.dir > 0 ? 1 : -1) * c.v * dt * (c.z * 0.55 + 0.5) * 0.9;
+        if (c.hold) { if (laneFree(c)) c.hold = false; else { place(c); return; } }
+        c.z += (c.dir > 0 ? 1 : -1) * c.v * dt * (c.z * 0.55 + 0.5) * PACE;
         if (c.dir > 0 && c.z > ZMAX) reroll(c);
-        if (c.dir < 0 && c.z < 1.3) reroll(c);
+        if (c.dir < 0 && c.z < ZNEAR) reroll(c);
         place(c);
       });
       peds.forEach(function (p) {
@@ -727,9 +740,11 @@
   if (REDUCE) return;
 
   var T = 4, last = 0, running = false, visible = true;
+  var TIME = H.name === 'encinitas' ? 0.55 : 1;   // the Encinitas street (people, cars, neon) runs at a slower, calmer pace
   function frame(now) {
     if (!running) return;
     var dt = last ? Math.min(0.05, (now - last) / 1000) : 0; last = now;
+    dt *= TIME;
     T += dt; step(T, dt);
     requestAnimationFrame(frame);
   }

@@ -128,12 +128,39 @@ def tally(items):
     return d
 
 
+def columns(rows):
+    """Vertical column chart. rows: (label, count, note)."""
+    maxv = max(c for _, c, _ in rows) or 1
+    out = ''
+    for label, c, note in rows:
+        out += ('<div class="col%s"><b>%d</b><i style="height:%dpx"></i><span>%s</span><small>%s</small></div>'
+                % (' now' if label == rows[-1][0] else '', c, max(28, round(200.0 * c / maxv)), E(label), note))
+    return '<div class="cols">%s</div>' % out
+
+
+def segments(rows):
+    """One stacked bar with a legend. rows: (label, count)."""
+    total = sum(v for _, v in rows) or 1
+    bar = ''.join('<i class="s%d" style="flex:%d" title="%s: %d"></i>' % (n, v, E(l), v) for n, (l, v) in enumerate(rows))
+    legend = ''.join('<li><span class="dot s%d"></span>%s<b>%d</b></li>' % (n, E(l), v) for n, (l, v) in enumerate(rows))
+    return '<div class="seg" role="img" aria-label="%s">%s</div><ul class="seg-key">%s</ul>' % (
+        E(', '.join('%s %d of %d' % (l, v, total) for l, v in rows)), bar, legend)
+
+
+def last_12_months(rows):
+    y, m, d = (int(x) for x in D['asOf'].split('-'))
+    cutoff = '%04d-%02d-%02d' % (y - 1, m, d)
+    return sum(1 for t in rows if t.get('soldDate') and t['soldDate'] >= cutoff)
+
+
+FEATURED = 5  # latest closed sales shown before "Show all"
+
+
 def main_region():
     priced = [t for t in TX if t.get('soldPrice')]
     prices = [t['soldPrice'] for t in priced]
     total = len(TX)
     volume = sum(prices)
-    avg = volume / len(prices)
     med = statistics.median(prices)
     ppsf = [t['soldPrice'] / t['sqft'] for t in priced if t.get('sqft')]
     by_year = tally(t['soldDate'][:4] for t in priced if t.get('soldDate'))
@@ -141,15 +168,13 @@ def main_region():
     for t in priced:
         if t.get('soldDate'): vol_year[t['soldDate'][:4]] = vol_year.get(t['soldDate'][:4], 0) + t['soldPrice']
     yr = sorted(by_year)
-    year_rows = [('%s%s' % (y, ' so far' if y == yr[-1] else ''), by_year[y]) for y in yr]
+    year_cols = [('%s%s' % (y, ' so far' if y == yr[-1] else ''), by_year[y], short_money(vol_year[y])) for y in yr]
     city_rows = sorted(tally(t['city'] for t in TX).items(), key=lambda kv: (-kv[1], kv[0]))
     bands = [('Under $600K', sum(1 for p in prices if p < 600000)), ('$600K to $999K', sum(1 for p in prices if 600000 <= p < 1000000)),
              ('$1M and up', sum(1 for p in prices if p >= 1000000))]
-    roles = tally(t.get('role') or 'Not confirmed' for t in TX)
-    side_label = {'Buyer': 'Buyer side', 'Seller': 'Seller side', 'Buyer and Seller': 'Both sides', 'Not confirmed': 'Not confirmed'}
-    side_rows = [(side_label[k], roles[k]) for k in ('Buyer', 'Seller', 'Buyer and Seller', 'Not confirmed') if k in roles]
-    types = tally(('condos' if t.get('type') == 'Condo' else 'houses') for t in TX if t.get('type'))
-    type_note = ' and '.join('%d %s' % (v, k) for k, v in sorted(types.items(), key=lambda kv: -kv[1]))
+    roles = tally(t['role'] for t in TX if t.get('role'))
+    side_label = {'Buyer': 'Buyers', 'Seller': 'Sellers', 'Buyer and Seller': 'Both sides'}
+    side_rows = [(side_label[k], roles[k]) for k in ('Buyer', 'Seller', 'Buyer and Seller') if k in roles]
     cities_in_order = []
     for t in TX:
         if t['city'] not in cities_in_order: cities_in_order.append(t['city'])
@@ -157,50 +182,54 @@ def main_region():
     chips = ('<button class="chip on" data-filter="all">All</button>'
              '<button class="chip" data-filter="Represented the Buyer">Buyer side</button>'
              '<button class="chip" data-filter="Represented the Seller">Seller side</button>' +
-             ''.join('<button class="chip" data-filter="%s">%s</button>' % (E(c), E(c)) for c in sorted(cities_in_order, key=lambda c: -count_city(c))))
-    cards = ''.join(live_card(p) for p in LIVE) + ''.join(sold_card(t) for t in TX)
+             ''.join('<button class="chip" data-filter="%s">%s</button>' % (E(c), E(c)) for c in sorted(cities_in_order, key=lambda c: -count_city(c))[:4]))
+    # Cards: the current listing and every sale with a photo. Newest few show first, the rest open with "Show all".
+    carded = [t for t in TX if t.get('photoUrl')]
+    card_html = [live_card(p) for p in LIVE] + [sold_card(t) for t in carded]
+    first = len(LIVE) + FEATURED
+    cards = ''.join(c if i < first else c.replace('<article class="sale"', '<article class="sale later"', 1) for i, c in enumerate(card_html))
+    more = len(card_html) - first
     rows = ''
     for t in TX:
         url, _ = link_for(t)
         name = ('<a href="%s" target="_blank" rel="noopener">%s</a>' % (E(url), E(street_line(t)))) if url else E(street_line(t))
-        rows += '<tr><td>%d</td><td>%s</td><td>%s, %s</td><td>%s</td><td>%s</td><td>%s</td></tr>' % (
-            t['n'], name, E(t['city']), E(t['zip']), when(t, short=False) or '', money(t['soldPrice']), E(t.get('role') or 'To be confirmed'))
-    trend = ', '.join('%d in %s' % (by_year[y], y) for y in reversed(yr))
+        rows += '<tr><td>%s, %s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>' % (
+            name, E(t['city']), when(t, short=False) or '', money(t['soldPrice']), E({'Buyer': 'Buyer', 'Seller': 'Seller', 'Buyer and Seller': 'Buyer and seller'}.get(t.get('role'), '')),
+            ('{:,} sq ft'.format(t['sqft']) if t.get('sqft') else ''))
+    area_pills = ''.join('<li><b>%d</b> %s</li>' % (v, E(k)) for k, v in city_rows)
     return '''<section><div class="wrap">
 <div class="stat-row" data-stagger>
-<div class="stat"><b>%(total)d</b><span>closed sales on Zillow, newest to oldest below</span></div>
-<div class="stat"><b>%(vol)s</b><span>total sales volume across all %(total)d</span></div>
-<div class="stat"><b>%(avg)s</b><span>average sale price, from %(lo)s to %(hi)s</span></div>
-<div class="stat"><b>%(rating)s</b><span>Zillow rating, %(rc)d reviews</span></div>
+<div class="stat"><b>%(total)d</b><span>closed sales</span></div>
+<div class="stat"><b>%(vol)s</b><span>in total sales volume</span></div>
+<div class="stat"><b>%(l12)d</b><span>homes closed in the last 12 months</span></div>
+<div class="stat"><b>%(rating)s<em>&#9733;</em></b><span>on Zillow, %(rc)d client reviews</span></div>
 </div>
 
-<div class="section-head" style="margin-top:56px"><span class="eyebrow">At a glance</span><h2>Aaron&rsquo;s sales by the numbers</h2></div>
-<div class="insights">
-<div class="insight"><h3>Sales by year</h3>%(yearbars)s<p class="insight-note">Volume: %(yearnote)s</p></div>
-<div class="insight"><h3>Where the %(total)d closings happened</h3>%(citybars)s</div>
-<div class="insight"><h3>By price range</h3>%(bandbars)s<p class="insight-note">Median sale price %(med)s.</p></div>
-<div class="insight"><h3>Which side Aaron represented</h3>%(sidebars)s<p class="insight-note">%(typenote)s among the sales with property details.</p></div>
-</div>
-<div class="stat-row three" data-stagger>
-<div class="stat"><b>%(med)s</b><span>median sale price</span></div>
-<div class="stat"><b>%(medppsf)s</b><span>median price per sq ft across %(nppsf)d homes</span></div>
-<div class="stat"><b>%(cur)d</b><span>closed sales so far in %(curyear)s, up from %(prev)d in %(prevyear)s and %(prev2)d in %(prev2year)s</span></div>
+<div class="section-head" style="margin-top:64px"><span class="eyebrow">The track record</span><h2>Busier every year</h2><p>A snapshot of Aaron&rsquo;s closed sales: how the business is growing, what Aaron sells, and who he works with.</p></div>
+<div class="dash">
+<div class="insight dash-year"><h3>Closings per year</h3>%(yearcols)s</div>
+<div class="insight dash-price"><h3>Typical home</h3>
+<p class="big"><b>%(med)s</b><span>median sale price</span></p>
+<p class="big sm"><b>%(medppsf)s</b><span>median price per sq ft</span></p>
+<p class="seg-cap">Closed sales by price range</p>%(bandseg)s</div>
+<div class="insight dash-side"><h3>Buyers and sellers</h3><p class="seg-cap">Who Aaron represented</p>%(sideseg)s<p class="insight-note">Aaron works both sides of the table.</p></div>
+<div class="insight dash-where"><h3>Where Aaron closes</h3><ul class="pills">%(areas)s</ul></div>
 </div>
 
-<div class="section-head" style="margin-top:56px"><span class="eyebrow">Homes</span><h2>Current listing and every closed sale</h2></div>
+<div class="section-head" style="margin-top:64px"><span class="eyebrow">Homes</span><h2>Recent sales and current listing</h2></div>
 <div class="chips" role="group" aria-label="Filter sales">%(chips)s</div>
 <div class="grid g3 sales-grid" data-stagger>%(cards)s</div>
+<p class="more-wrap"><button class="btn btn-light more-btn" type="button" data-more>Show all %(ncards)d closed sales</button></p>
 
-<div class="section-head" style="margin-top:56px"><span class="eyebrow">Full history</span><h2>Every closed sale at a glance</h2><p>Newest first.</p></div>
-<div class="tx-wrap"><table class="tx"><thead><tr><th>#</th><th>Property</th><th>City</th><th>Closed</th><th>Sold price</th><th>Aaron represented</th></tr></thead><tbody>%(rows)s</tbody></table></div>
-<p class="note" style="margin-top:22px">These are the %(total)d closed sales on Aaron Abrams&rsquo;s <a href="%(z)s" target="_blank" rel="noopener">Zillow profile</a>. Sales shown are transactions in which Aaron Abrams represented the buyer, the seller, or both, as noted; the role reads &ldquo;To be confirmed&rdquo; where it has not been verified. Closed prices are public record. Prices, dates and details come from the San Diego MLS, Redfin and Zillow, and the %(total)d prices add up to %(volfull)s, an average of %(avgfull)s. Anything marked &ldquo;For sale now&rdquo; is a current listing, not a closed sale. Listing photos are courtesy of the listing brokerages. Data as of %(asof)s.</p>
+<details class="tx-details"><summary>View every closed sale as a list</summary>
+<div class="tx-wrap"><table class="tx"><thead><tr><th>Property</th><th>Closed</th><th>Sold price</th><th>Represented</th><th>Size</th></tr></thead><tbody>%(rows)s</tbody></table></div></details>
+<p class="note" style="margin-top:22px">Closed sales on Aaron Abrams&rsquo;s <a href="%(z)s" target="_blank" rel="noopener">Zillow profile</a>, in which he represented the buyer, the seller, or both. Closed prices are public record, and prices, dates and details come from the San Diego MLS, Redfin and Zillow. The %(total)d sales add up to %(volfull)s, an average of %(avgfull)s. Anything marked &ldquo;For sale now&rdquo; is a current listing, not a closed sale. Listing photos are courtesy of the listing brokerages. Data as of %(asof)s.</p>
 </div></section>
-''' % dict(total=total, vol=short_money(volume), volfull=money(volume), avg=short_money(avg), avgfull=money(avg),
-           lo='$%dK' % round(min(prices) / 1000), hi='$%.2fM' % (max(prices) / 1e6), rating='%.1f' % Z['rating'], rc=Z['reviewCount'],
-           yearbars=bars(year_rows), yearnote=' &middot; '.join('%s %s' % (y, short_money(vol_year[y])) for y in yr),
-           citybars=bars(city_rows), bandbars=bars(bands), med=money(med), sidebars=bars(side_rows), typenote=type_note,
-           medppsf='$%s' % '{:,}'.format(round(statistics.median(ppsf))), nppsf=len(ppsf), cur=by_year[yr[-1]], curyear=yr[-1], prev=by_year[yr[-2]], prevyear=yr[-2], prev2=by_year[yr[-3]], prev2year=yr[-3],
-           chips=chips, cards=cards, rows=rows, asof=when({'soldDate': D['asOf']}, short=False), z=ZPROFILE)
+''' % dict(total=total, vol=short_money(volume), volfull=money(volume), avgfull=money(volume / len(prices)), l12=last_12_months(priced),
+           rating='%.1f' % Z['rating'], rc=Z['reviewCount'], yearcols=columns(year_cols), med=money(med),
+           medppsf='$%s' % '{:,}'.format(round(statistics.median(ppsf))), bandseg=segments(bands), sideseg=segments(side_rows),
+           areas=area_pills, chips=chips, cards=cards, ncards=len(carded), rows=rows,
+           asof=when({'soldDate': D['asOf']}, short=False), z=ZPROFILE)
 
 
 def swap(path, name, new):

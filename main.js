@@ -119,11 +119,21 @@
   chips.forEach(function(c){ c.addEventListener('click',function(){
     chips.forEach(function(x){x.classList.toggle('on',x===c);});
     var f=c.getAttribute('data-filter');
+    var grid=document.querySelector('.sales-grid'), moreWrap=document.querySelector('.more-wrap');
+    // Filtering searches every sale; "All" goes back to the short list unless Show all was pressed.
+    if(grid) grid.classList.toggle('open', f!=='all' || grid.getAttribute('data-expanded')==='1');
+    if(moreWrap) moreWrap.hidden = f!=='all' || (grid && grid.getAttribute('data-expanded')==='1');
     document.querySelectorAll('.sales-grid .sale').forEach(function(s){
       s.hidden = !(f==='all' || s.getAttribute('data-area')===f || s.getAttribute('data-role')===f);
     });
     if(window.ScrollTrigger) window.ScrollTrigger.refresh();
   });});
+  var moreBtn=document.querySelector('[data-more]');
+  if(moreBtn) moreBtn.addEventListener('click',function(){
+    var grid=document.querySelector('.sales-grid'); grid.classList.add('open'); grid.setAttribute('data-expanded','1');
+    moreBtn.parentNode.hidden=true;
+    if(window.ScrollTrigger) window.ScrollTrigger.refresh();
+  });
   var lb=document.querySelector('.lightbox'); if(!lb) return;
   var img=lb.querySelector('img'), list=[], i=0, opener=null, pushed=false;
   // A modal photo viewer: focus moves in and stays in, Escape or the browser back button closes it,
