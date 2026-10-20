@@ -301,3 +301,18 @@
     window.addEventListener('pageshow',function(){ f.__sent=false; b.removeAttribute('aria-disabled'); b.classList.remove('is-sending'); b.textContent=label; });
   });
 })();
+
+// Performance governor: if this computer cannot keep the page near 40 frames a second for a few seconds in a row,
+// switch the decorative motion (scene life and the particle glow) to a lighter 30 frame mode. Machines that keep up
+// never see a change.
+(function(){
+  var perf=window.__perf={lite:false};
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches||!window.requestAnimationFrame) return;
+  var last=0,n=0,sum=0,slow=0;
+  function tick(now){
+    if(document.hidden){ last=0; n=0; sum=0; return requestAnimationFrame(tick); }
+    if(last){ var d=now-last; if(d<250){ sum+=d; n++; if(n===45){ slow=(sum/n>26)?slow+1:0; n=0; sum=0; if(slow>=3){ perf.lite=true; document.documentElement.classList.add('perf-lite'); return; } } } }
+    last=now; requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();

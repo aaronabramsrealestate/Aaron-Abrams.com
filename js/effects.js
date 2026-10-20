@@ -76,7 +76,9 @@
   }
   Field.prototype.resize = function () {
     this.w = this.host.clientWidth; this.h = this.host.clientHeight;
-    this.dpr = Math.min(window.devicePixelRatio || 1, SMALL ? 1.25 : 1.5);
+    this.lite = !!(window.__perf && window.__perf.lite);
+    // the glow sprites are soft, so a 1x canvas looks the same as 1.5x here and uses about 55% fewer pixels
+    this.dpr = 1;
     this.c.width = Math.round(this.w * this.dpr); this.c.height = Math.round(this.h * this.dpr);
     this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
   };
@@ -85,6 +87,7 @@
     if (this.mode === 'bio') n = clamp(area / (SMALL ? 5200 : 3800), 60, SMALL ? 140 : 320);
     else n = clamp(area / (SMALL ? 8000 : 5200), 50, SMALL ? 110 : 260);
     if (REDUCE) n = Math.round(n * 0.4);
+    if (this.lite) n = Math.round(n * 0.65);
     this.p = [];
     for (var i = 0; i < n; i++) {
       var z = 0.3 + Math.random() * 0.7;
@@ -111,6 +114,10 @@
     function loop(now) {
       self.raf = 0;
       if (!self.visible || document.hidden) return;
+      var lite = !!(window.__perf && window.__perf.lite);
+      // 60 draws a second is enough (30 in lite mode); faster screens only repeat the same picture
+      if (now - self.last < (lite ? 28 : 12)) { self.raf = requestAnimationFrame(loop); return; }
+      if (lite && !self.lite) { self.resize(); self.seed(); }     // lighter canvas, once
       var dt = Math.min(48, now - self.last); self.last = now;
       self.step(dt); self.draw();
       self.raf = requestAnimationFrame(loop);
