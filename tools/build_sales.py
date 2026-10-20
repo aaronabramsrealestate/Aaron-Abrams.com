@@ -7,10 +7,12 @@ It rewrites the regions between <!-- name:start --> and <!-- name:end --> marker
   sales.html       sales:main    stats, charts, a card for every sale, and the full table
   properties.html  live, recent  current listing and the latest sales
   index.html       recent        the "Recently closed" cards
+  <community>.html area-sales    the sales in that community, on its community guide page
 
 To add or correct a sale, edit its entry in data/transactions.json and run this again.
 Fields: soldPrice, soldDate (YYYY-MM-DD), role (Buyer, Seller, Buyer and Seller, or null),
-beds, baths, sqft, yearBuilt, type, mls, photoUrl (the listing's first photo), source, link.
+beds, baths, sqft, yearBuilt, type, mls, photoUrl (the listing's first photo), source, link,
+community (the community page the sale belongs on, such as "oceanside" for oceanside.html, or null).
 """
 import html
 import json
@@ -232,6 +234,19 @@ def main_region():
            asof=when({'soldDate': D['asOf']}, short=False), z=ZPROFILE)
 
 
+def area_region(slug, sales):
+    """The "homes I've helped clients buy and sell" block on a community guide page."""
+    page = open(os.path.join(ROOT, slug + '.html'), encoding='utf-8').read()
+    name = html.unescape(re.search(r'<h2>([^<]*) FAQ</h2>', page).group(1))
+    words = {1: 'One home', 2: 'Two homes', 3: 'Three homes', 4: 'Four homes', 5: 'Five homes'}
+    homes = words.get(len(sales), '%d homes' % len(sales))
+    return ('<div class="area-sales"><h2>Homes I&rsquo;ve helped clients buy and sell in %s</h2>\n'
+            '<p>%s I closed here, straight from my transaction history. <a href="sales.html">See all %d sales</a>.</p>\n'
+            '<div class="grid g2 sales-grid">%s</div></div>') % (
+        E(name), homes, len(TX),
+        ''.join(sold_card(t, False) for t in sales))
+
+
 def swap(path, name, new):
     p = os.path.join(ROOT, path)
     s = open(p, encoding='utf-8').read()
@@ -249,4 +264,9 @@ if __name__ == '__main__':
     swap('properties.html', 'recent', '<div class="grid g3 sales-grid" data-stagger>%s</div>' % ''.join(sold_card(t, False) for t in carded[:3]))
     swap('index.html', 'recent', '<div class="grid g3 sales-grid" data-stagger>%s</div>' % (
         ''.join(live_card(p) for p in LIVE) + ''.join(sold_card(t, False) for t in carded[:2])))
-    print('built: %d sales, %d with photos' % (len(TX), len(carded)))
+    areas = {}
+    for t in TX:
+        if t.get('community'): areas.setdefault(t['community'], []).append(t)
+    for slug, sales in sorted(areas.items()):
+        swap(slug + '.html', 'area-sales', area_region(slug, sales))
+    print('built: %d sales, %d with photos, %d community pages' % (len(TX), len(carded), len(areas)))

@@ -17,6 +17,39 @@
   window.addEventListener('pageshow',function(e){ if(e.persisted) window.__scrollLock.clear(); });
 })();
 
+// Analytics and lead tracking. The Google tag (G-7LHDBV3NSV) sits at the top of every page's
+// <head>; this sends these actions to it as events, which can be marked as key events
+// (conversions) in Google Analytics:
+//   generate_lead      a contact or home value form was sent (form_name says which)
+//   book_consultation  a consultation was booked in the Calendly calendar
+//   open_calendar      a "Schedule a Consultation" style button was clicked
+//   click_call, click_text, click_email, click_zillow
+window.__track=function(name,params){ if(window.gtag) window.gtag('event',name,params||{}); };
+(function(){
+  var track=window.__track;
+  document.addEventListener('click',function(e){
+    var a=e.target.closest&&e.target.closest('a[href]'); if(!a) return;
+    var h=a.getAttribute('href'), where={link_text:(a.textContent||'').trim().slice(0,80)};
+    if(a.hasAttribute('data-calendly')) track('open_calendar',where);
+    else if(h.indexOf('tel:')===0) track('click_call',where);
+    else if(h.indexOf('sms:')===0) track('click_text',where);
+    else if(h.indexOf('mailto:')===0) track('click_email',where);
+    else if(/zillow\.com/.test(h)) track('click_zillow',where);
+  },true);
+  document.addEventListener('submit',function(e){
+    var f=e.target; if(!f.hasAttribute||!f.hasAttribute('data-netlify')||f.__tracked) return;
+    f.__tracked=true;
+    var i=f.querySelector('[name="interest"]');
+    track('generate_lead',{form_name:f.getAttribute('name'),interest:i?i.value:''});
+  },true);
+  window.addEventListener('pageshow',function(){ document.querySelectorAll('form[data-netlify]').forEach(function(f){ f.__tracked=false; }); });
+  // Calendly tells the page when a meeting is booked
+  window.addEventListener('message',function(e){
+    if(e.origin!=='https://calendly.com'||!e.data||e.data.event!=='calendly.event_scheduled') return;
+    track('book_consultation',{});
+  });
+})();
+
 // Mobile menu and small helpers
 (function(){
   var t=document.querySelector('.menu-toggle'),m=document.getElementById('menu');
@@ -182,16 +215,15 @@
   });
 })();
 
-// Forms in the pinned sidebar scroll inside their own box on shorter screens. The box
-// keeps its scroll to itself (overscroll-behavior: contain), so reaching its top or
-// bottom never carries on into the page behind it. Smooth scrolling is told to leave the
-// box alone only while it actually overflows. When a field is tabbed or clicked into,
-// the box scrolls just enough to show the whole field.
+// The sidebar (booking card and form) stays pinned while the page scrolls, but only when
+// the whole sidebar fits on screen. On shorter screens, such as most laptops, it scrolls
+// with the page instead, so the Send button is never hidden inside a small inner scroll box.
 (function(){
   var boxes=document.querySelectorAll('.sticky');
   if(!boxes.length) return;
   function check(){
     boxes.forEach(function(b){
+      b.classList.toggle('sticky-off', b.scrollHeight > window.innerHeight - 116);
       var scrolls=b.scrollHeight>b.clientHeight+1 && getComputedStyle(b).overflowY!=='visible';
       if(scrolls) b.setAttribute('data-lenis-prevent',''); else b.removeAttribute('data-lenis-prevent');
     });

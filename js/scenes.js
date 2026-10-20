@@ -2,7 +2,8 @@
  *
  * Four original illustrations (Encinitas sign, Carlsbad coast and flower fields, vineyards,
  * Point Loma and Shelter Island). One is drawn into the hero on each page load, and a different
- * one is picked than last time. Add ?scene=1 to 4 to the address to force one while editing.
+ * one is picked than last time. A page can pin its own scene with data-scene-pick on the hero
+ * (Carlsbad shows the Carlsbad coast, for example). Add ?scene=1 to 4 to the address to force one while editing.
  * Layers use the same markup as the rest of the hero, so the parallax and the sunset to night
  * scroll in effects.js work on them unchanged.
  */
@@ -12,8 +13,13 @@
   var scene = document.querySelector('.scene');
   if (!scene) return;
   var i = -1, m = /[?&]scene=([1-4])/.exec(location.search);
+  var pin = scene.getAttribute('data-scene-pick');
   if (m) i = +m[1] - 1;
-  else {
+  else if (pin) {
+    // Community pages with a matching illustration always show it
+    for (var k = 0; k < S.length; k++) if (S[k].n === pin) i = k;
+  }
+  if (i < 0) {
     var last = -1;
     try { last = +sessionStorage.getItem('hero-scene'); if (isNaN(last)) last = -1; } catch (e) {}
     i = Math.floor(Math.random() * S.length);

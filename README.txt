@@ -35,7 +35,10 @@ STILL TO CONFIRM OR SUPPLY BEFORE LAUNCH
      The two web forms (contact and home-value) are the backup way to reach Aaron.
   4. Sales, listings and reviews. The sales data lives in data/transactions.json. To add or fix a sale,
      edit its entry there and run: python3 tools/build_sales.py (it rewrites sales.html, properties.html,
-     and the homepage cards). All 20 sales have a price and date; 3057 Walton Pl still needs a photo and a confirmed role.
+     the homepage cards, and the "Homes I've helped clients buy and sell" section on each
+     community page). Each sale's "community" field names the community page it appears on
+     (for example "oceanside"), or null. All 20 sales have a price and date; 3057 Walton Pl
+     still needs a photo and a confirmed role.
      sales.html, properties.html, the homepage "Recently closed" section,
      and reviews.html were built from Aaron's public Zillow profile (the current listing and the 5
      most recent of the 20 sales Zillow reports, plus 4 review excerpts). Photos are linked from
@@ -79,6 +82,15 @@ CONNECT THE DOMAIN
 2. Follow the DNS instructions Netlify shows (Netlify DNS is simplest).
 3. After DNS propagates, provision the free HTTPS certificate in the same screen.
 
+ANALYTICS
+- The Google tag (Google Analytics 4, G-7LHDBV3NSV) is at the top of every page's <head>.
+  New pages need the same snippet, and only one copy per page.
+- main.js sends these events to it: generate_lead (a form was sent), book_consultation
+  (a Calendly booking), open_calendar, click_call, click_text, click_email, click_zillow.
+  In Google Analytics: Admin > Events, mark generate_lead and book_consultation (and the
+  call and text clicks if wanted) as key events so they count as conversions.
+- Link Google Analytics to Search Console: Admin > Product links > Search Console links.
+
 AFTER LAUNCH
 - Google Search Console: add the site and submit sitemap.xml.
 - Bing Webmaster Tools: import from Search Console.
@@ -88,10 +100,17 @@ HERO ARTWORK
 - Four original scenes (Encinitas sign, Carlsbad coast and flower fields, vineyards, Point Loma and
   Shelter Island) live in js/scenes.js. One is drawn into the top of every page, and a different
   one is picked each time the page loads. Add ?scene=1 to 4 to the address to force one.
+  Community pages with a matching scene always show it (data-scene-pick on the hero): Carlsbad,
+  Encinitas, Point Loma and Ocean Beach, and the vineyard scene on Fallbrook, Bonsall and Escondido.
 - js/life.js animates each scene: traffic and pedestrians on the Encinitas street, beachgoers and
   surfers at Carlsbad, grape pickers, a truck and a tractor in the vineyard, and boats, a kayaker and
   a paddleboarder at Point Loma. It pauses when the hero is off screen and shows a still frame for
   visitors who prefer reduced motion.
+
+FONTS
+- Newsreader and Inter are served from fonts/ (Latin only, trimmed to the weights the site uses)
+  instead of Google Fonts, so text shows up faster. To change fonts, replace those two files and
+  the @font-face lines at the top of styles.css.
 
 MOTION AND EFFECTS
 - Animation libraries live in js/vendor (GSAP, ScrollTrigger, Lenis).

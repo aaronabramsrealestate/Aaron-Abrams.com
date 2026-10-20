@@ -1,10 +1,14 @@
 /* Aaron Abrams, Real Estate Advisor | coastal site styles */
+/* Self hosted fonts, Latin subset (Newsreader 500 to 600 with optical sizes 18 to 72, Inter 400 to 700).
+   Served from this site so the first paint does not wait on Google Fonts. */
+@font-face{font-family:"Newsreader";font-style:normal;font-weight:500 600;font-display:swap;src:url(fonts/newsreader-latin.woff2) format("woff2")}
+@font-face{font-family:"Inter";font-style:normal;font-weight:400 700;font-display:swap;src:url(fonts/inter-latin.woff2) format("woff2")}
 :root{
   --ink:#0a0a0a;
   --ink-soft:#4a5259;
   --ocean:#1a7699;
   --sea:#2596be;   /* brand blue */
-  --sea-text:#1a7699;   /* the same teal, a shade deeper, for small text on light backgrounds */
+  --sea-text:#166a8a;   /* the same teal, a shade deeper, for small text on light backgrounds */
   --sea-light:#dcf0f7;
   --sand:#f3f5f6;
   --foam:#ffffff;
@@ -121,7 +125,8 @@ section{padding:84px 0}
 .portrait{position:relative;aspect-ratio:4/5;border-radius:28px;overflow:hidden;background:linear-gradient(160deg,var(--sea-light),var(--sea));box-shadow:var(--shadow)}
 .portrait img{width:100%;height:100%;object-fit:cover}
 .portrait .ph{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--serif);font-size:3rem;color:#fff}
-.portrait img+.ph{display:none}
+.portrait img+.ph,.portrait picture+.ph{display:none}
+.portrait picture{display:contents}
 .badge-row{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 24px}
 .badge{font-size:.82rem;font-weight:600;background:var(--sand);border:1px solid var(--line);border-radius:999px;padding:6px 12px}
 
@@ -150,10 +155,11 @@ section{padding:84px 0}
 /* The pinned sidebar (booking card plus form) is about 1,040px tall, taller than most
    laptop screens. Pinned and taller than the screen, its lower half could never come
    into view, and focusing a lower field made the browser scroll the page in circles
-   trying to reveal it. Cap it to the space under the header and let it scroll on its
-   own. The padding and negative margin leave room for the card shadows that would
+   trying to reveal it. When it does not fit, main.js adds .sticky-off and it scrolls with
+   the page. The cap and inner scroll below are only a fallback for when that script has not run. The padding and negative margin leave room for the card shadows that would
    otherwise be clipped, without moving anything. */
 .sticky{position:sticky;top:96px;max-height:calc(100vh - 116px);max-height:calc(100dvh - 116px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(10,10,10,.28) transparent;padding:4px 6px 26px;margin:-4px -6px 0}
+.sticky.sticky-off{position:static;max-height:none;overflow:visible}
 .callout{background:var(--sea-light);border-radius:var(--radius);padding:22px 24px;margin:24px 0}
 .callout p:last-child{margin:0}
 .note{font-size:.85rem;color:var(--ink-soft)}
@@ -255,6 +261,12 @@ section{padding:84px 0}
 .glint-wrap{opacity:calc(1 - var(--night) * .9)}
 .bio-glow{opacity:var(--night)}
 .fx-canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:4}
+/* Soft shade behind the hero copy so the headline, intro, and trust line stay readable over
+   the busiest parts of the illustration (boats, beachgoers, the sun). It fades out well before
+   the right side of the scene. */
+.scene::after{content:"";position:absolute;inset:0;z-index:4;pointer-events:none;background:linear-gradient(90deg,rgba(9,16,38,.58) 0%,rgba(9,16,38,.42) 34%,rgba(9,16,38,.12) 58%,rgba(9,16,38,0) 72%)}
+@media (max-width:767px){.scene::after{background:linear-gradient(180deg,rgba(9,16,38,.5) 0%,rgba(9,16,38,.42) 55%,rgba(9,16,38,.1) 80%,rgba(9,16,38,0) 100%)}}
+.scene .trust span{text-shadow:0 1px 10px rgba(5,10,30,.6)}
 .scene-content{position:relative;z-index:5;padding-top:clamp(44px,8vh,100px)}
 .scene-home .scene-content{padding-top:clamp(40px,8vh,110px)}
 .scene h1{color:#fff;max-width:16ch;text-shadow:0 4px 22px rgba(10,20,50,.4)}
@@ -292,7 +304,8 @@ html.fx-cursor input,html.fx-cursor textarea,html.fx-cursor select{cursor:auto}
 .marquee{overflow:hidden;padding:30px 0 50px;background:var(--foam)}
 .marquee-row{display:flex;gap:.45em;white-space:nowrap;font-family:var(--serif);font-weight:600;font-size:clamp(3rem,9vw,8.5rem);line-height:1.05;will-change:transform}
 .marquee-row span{color:transparent;-webkit-text-stroke:1.5px var(--ocean)}
-.marquee-row.solid span{color:var(--sea);-webkit-text-stroke:0;opacity:.2}
+/* Drawn as clipped fill (same look as a 20% tint) so the decorative words are not read as low contrast text */
+.marquee-row.solid span{color:transparent;-webkit-text-stroke:0;background:rgba(37,150,190,.2);-webkit-background-clip:text;background-clip:text}
 .marquee-row b{color:var(--coral);font-weight:400;font-size:.32em;align-self:center}
 
 /* Horizontal gallery */
@@ -993,3 +1006,10 @@ html.scroll-locked{overflow:hidden;padding-right:var(--sbw,0)}
 .seg-cap{margin:16px 0 -6px;font-size:.78rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--sea-text)}
 .dash-side .seg-cap{margin-top:0}
 .sales-grid.open .sale.later[hidden]{display:none}
+
+/* Homepage reviews band: the review cards on a light background */
+.reviews-light .review{background:#fff;border:1px solid var(--line);color:var(--ink);box-shadow:var(--shadow);backdrop-filter:none}
+.reviews-light .review .stars{color:#d48a00}
+.reviews-light .review figcaption b{color:var(--ink)}
+.reviews-light .review figcaption span{color:var(--ink-soft)}
+.scene .trust a{color:inherit;text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(255,255,255,.5)}
