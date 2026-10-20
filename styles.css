@@ -343,7 +343,10 @@ html.fx-cursor input,html.fx-cursor textarea,html.fx-cursor select{cursor:auto}
   .scroll-cue i::after{animation:none}
 }
 .hgal .section-head{max-width:940px;margin-bottom:26px}
-.fx-pin.hgal{padding:44px 0 36px}
+.fx-pin.hgal{padding:44px 0 36px;overflow:visible}
+/* While the gallery is pinned, clip sideways overflow on the page instead of on the pinned section.
+   overflow:hidden on a pinned (position:fixed) section made Chrome score the pin as a full-screen layout shift. */
+body{overflow-x:clip}
 .fx-pin .h-track{gap:30px}
 .fx-pin .h-card{flex-basis:min(80vw,390px);height:min(56vh,520px);min-height:380px;padding:26px}
 .fx-pin .h-card h3{font-size:1.85rem}

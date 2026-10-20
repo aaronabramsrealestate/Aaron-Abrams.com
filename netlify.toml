@@ -16,6 +16,23 @@
   [headers.values]
     Cache-Control = "public, max-age=0, must-revalidate"
 
+# Images keep the same file names when they are replaced, so cache them for a day and let
+# browsers refresh in the background for a week instead of re-checking on every visit.
+[[headers]]
+  for = "/images/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400, stale-while-revalidate=604800"
+
+# Basic security headers for every page. No Content-Security-Policy on purpose: the site loads
+# Google Fonts and the Zillow photo hosts, and a strict policy would break them.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Frame-Options = "SAMEORIGIN"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=()"
+
 # Keep the links in the source exactly as written. Netlify's Pretty URLs
 # post-processing rewrites href="about.html" to href="/about", which no longer
 # matches the canonical tags and the sitemap (both use the .html address) and
