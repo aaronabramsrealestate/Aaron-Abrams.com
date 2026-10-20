@@ -2,8 +2,6 @@
 User-agent: *
 Allow: /
 Disallow: /thank-you.html
-Disallow: /guide-download.html
-Disallow: /downloads/
 
 User-agent: GPTBot
 Allow: /
@@ -23,4 +21,4 @@ Allow: /
 User-agent: Google-Extended
 Allow: /
 
-Sitemap: https://rickyheidt.com/sitemap.xml
+Sitemap: https://aaron-abrams.com/sitemap.xml

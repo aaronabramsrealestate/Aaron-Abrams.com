@@ -13,8 +13,8 @@
  */
 
 const FUB_URL = 'https://api.followupboss.com/v1/events';
-const SOURCE = 'rickyheidt.com';
-const SYSTEM = 'RickyTheRealtorSD-Website';
+const SOURCE = 'aaron-abrams.com';
+const SYSTEM = 'AaronAbrams-Website';
 
 function clean(v) {
   return typeof v === 'string' ? v.trim().slice(0, 2000) : '';
@@ -24,19 +24,18 @@ export function buildEvent(payload) {
   const d = payload.data || {};
   const form = payload.form_name || d['form-name'] || 'contact';
   const isHomeValue = form === 'home-value';
-  const isGuide = form === 'relocation-guide';
 
   const name = clean(d.name);
   const parts = name.split(/\s+/).filter(Boolean);
   const firstName = parts.shift() || '';
   const lastName = parts.join(' ');
 
-  const interest = clean(d.interest) || (isHomeValue ? 'Free home valuation' : isGuide ? 'Relocating to San Diego' : 'Website inquiry');
-  const isSeller = isHomeValue || /sell|valuation/i.test(interest);
-  const page = clean(d.page) || (isHomeValue ? 'Home Value' : isGuide ? 'Relocation Guide' : 'Website');
+  const interest = clean(d.interest) || (isHomeValue ? 'Home value review' : 'Website inquiry');
+  const isSeller = isHomeValue || /sell|valuation|value review/i.test(interest);
+  const page = clean(d.page) || (isHomeValue ? 'Home Value' : 'Website');
 
   const details = [
-    `Form: ${isHomeValue ? 'Free Home Value' : isGuide ? 'Relocation Guide Download' : 'Contact'}`,
+    `Form: ${isHomeValue ? 'Home Value Review' : 'Contact'}`,
     `Interested in: ${interest}`,
     `Page: ${page}`,
   ];
@@ -46,20 +45,14 @@ export function buildEvent(payload) {
     if (d.timeline) details.push(`Selling timeline: ${clean(d.timeline)}`);
   }
 
-  if (isGuide) {
-    if (d.moving_from) details.push(`Moving from: ${clean(d.moving_from)}`);
-    if (d.timeline) details.push(`Moving timeline: ${clean(d.timeline)}`);
-  }
-
-  const tags = ['Website Lead', isHomeValue ? 'Home Value Request' : isGuide ? 'Relocation Guide' : 'Website Contact'];
-  if (isGuide) tags.push('Relocation');
-  if (page && !['Website', 'Home Value', 'Relocation Guide'].includes(page)) tags.push(`Web: ${page}`);
+  const tags = ['Website Lead', isHomeValue ? 'Home Value Request' : 'Website Contact'];
+  if (page && !['Website', 'Home Value'].includes(page)) tags.push(`Web: ${page}`);
 
   const event = {
     source: SOURCE,
     system: SYSTEM,
-    type: isGuide ? 'Registration' : isSeller ? 'Seller Inquiry' : 'General Inquiry',
-    message: clean(d.message) || (isHomeValue ? `Requested a home valuation for ${clean(d.address)}` : isGuide ? 'Downloaded the San Diego relocation guide' : interest),
+    type: isSeller ? 'Seller Inquiry' : 'General Inquiry',
+    message: clean(d.message) || (isHomeValue ? `Requested a home value review for ${clean(d.address)}` : interest),
     description: details.join('\n'),
     person: {
       firstName,

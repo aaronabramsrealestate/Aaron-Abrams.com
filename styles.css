@@ -1,4 +1,4 @@
-/* Ricky Heidt, REALTOR® | coastal site styles */
+/* Aaron Abrams, Real Estate Advisor | coastal site styles */
 :root{
   --ink:#0d2536;
   --ink-soft:#3b5566;
@@ -9,8 +9,8 @@
   --sand:#f3ebdd;
   --foam:#fbf8f2;
   --white:#ffffff;
-  --coral:#e2725b;
-  --coral-dark:#c65a44;
+  --coral:#3f7a5a;   /* restrained sage green accent (name kept from the template) */
+  --coral-dark:#2f6046;
   --line:#e2d8c6;
   --radius:18px;
   --shadow:0 18px 40px -22px rgba(13,37,54,.35);
@@ -258,7 +258,7 @@ section{padding:84px 0}
 .scene-content{position:relative;z-index:5;padding-top:clamp(44px,8vh,100px)}
 .scene-home .scene-content{padding-top:clamp(40px,8vh,110px)}
 .scene h1{color:#fff;max-width:16ch;text-shadow:0 4px 22px rgba(10,20,50,.4)}
-.scene-home h1{font-size:clamp(2.6rem,5.4vw,5rem);max-width:13ch;line-height:1.02}
+.scene-home h1{font-size:clamp(2.3rem,4.6vw,4.2rem);max-width:19ch;line-height:1.05}
 .scene .lead{color:rgba(255,255,255,.93);max-width:54ch;text-shadow:0 2px 16px rgba(10,20,50,.35)}
 .scene .eyebrow{color:#ffe0c2}
 .scene .crumbs{color:rgba(255,255,255,.85)}
@@ -276,10 +276,10 @@ section{padding:84px 0}
 /* Scroll progress + cursor */
 .progress{position:fixed;top:0;left:0;right:0;height:3px;z-index:90;background:linear-gradient(90deg,var(--coral),#ffd9a6,#5ff0ff);transform-origin:0 50%;transform:scaleX(0);pointer-events:none}
 .cursor-dot,.cursor-ring{position:fixed;top:0;left:0;z-index:9999;pointer-events:none;border-radius:50%;opacity:0;transition:opacity .3s}
-.cursor-dot{width:8px;height:8px;background:var(--coral);box-shadow:0 0 14px rgba(226,114,91,.8)}
+.cursor-dot{width:8px;height:8px;background:var(--coral);box-shadow:0 0 14px rgba(63,122,90,.8)}
 .cursor-ring{width:40px;height:40px;border:1.5px solid rgba(20,80,107,.55);transition:width .3s,height .3s,background .3s,border-color .3s,opacity .3s}
 .cursor-ring.dark{border-color:rgba(255,255,255,.75)}
-.cursor-ring.big{width:74px;height:74px;background:rgba(226,114,91,.12);border-color:var(--coral)}
+.cursor-ring.big{width:74px;height:74px;background:rgba(63,122,90,.12);border-color:var(--coral)}
 html.fx-cursor .cursor-dot,html.fx-cursor .cursor-ring{opacity:1}
 html.fx-cursor,html.fx-cursor a,html.fx-cursor button,html.fx-cursor summary,html.fx-cursor label{cursor:none}
 html.fx-cursor input,html.fx-cursor textarea,html.fx-cursor select{cursor:auto}
@@ -353,11 +353,11 @@ html.fx-cursor input,html.fx-cursor textarea,html.fx-cursor select{cursor:auto}
 .scene:not(.scene-home){height:86vh;min-height:640px}
 .scene .btn-light{background:rgba(10,30,50,.35);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 @media (max-width:767px){.scene:not(.scene-home){height:auto}}
-.scene-home h1{font-size:clamp(2.4rem,min(5.4vw,8.4vh),5rem)}
+.scene-home h1{font-size:clamp(2.2rem,min(4.6vw,7.6vh),4.2rem)}
 @media (max-height:820px) and (min-width:768px){
   .scene-home .trust{display:none}
   .scene-home .lead{font-size:1.05rem;max-width:60ch}
-  .scene-home h1{max-width:15ch}
+  .scene-home h1{max-width:19ch}
   .scene-home .scene-content{padding-top:5vh}
 }
 
@@ -527,7 +527,7 @@ html.lenis{scroll-behavior:auto!important}
   .scene:not(.scene-home) .scene-content{padding-top:clamp(28px,4.5vh,100px)}
   .scene-content{padding-bottom:76px}
   .scene-home .scene-content{padding-top:clamp(28px,5vh,110px)}
-  .scene-home h1{font-size:clamp(2.05rem,7.2vw,3.2rem)}
+  .scene-home h1{font-size:clamp(1.85rem,6.6vw,2.8rem)}
   /* The interior hero h1 carries its own desktop-sized floor */
   .scene:not(.scene-home) h1{font-size:clamp(1.95rem,6.4vw,2.8rem)}
 }
@@ -884,3 +884,17 @@ html.scroll-locked{overflow:hidden;padding-right:var(--sbw,0)}
 .hgal .eyebrow{color:#8fd0cc}
 .nb-kind{display:block;margin:0 0 6px;font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--sea-text)}
 .hmap-sec{scroll-margin-top:30px}   /* keeps "Explore the map" clear of the sticky header when linked to */
+
+/* Aaron Abrams additions */
+.h-pl{background:linear-gradient(140deg,#cfe8e6,#2b8a8f 50%,#14506b)}
+.h-mv{background:linear-gradient(140deg,#e9dcc0,#6f9f8f 50%,#1d4e6e)}
+.h-rp{background:linear-gradient(140deg,#e7d3b0,#9a8a5e 50%,#3d4a3a)}
+.h-rb{background:linear-gradient(140deg,#f3e2c0,#c79a63 50%,#5a4636)}
+.h-bo{background:linear-gradient(140deg,#dcd7a8,#7d8f5a 50%,#33432f)}
+.h-fb{background:linear-gradient(140deg,#e8cf9f,#a5864f 50%,#3b4b36)}
+.cta-band .btn-coral{background:#fff;color:var(--ocean)}
+.cta-band .btn-coral:hover{background:var(--sand);color:var(--ink)}
+.prose ul li a,.prose p a{text-underline-offset:3px}
+.prose h2[id]{scroll-margin-top:96px}
+.split>.portrait:has(+.prose){align-self:start;position:sticky;top:96px}
+@media (max-width:900px){.split>.portrait:has(+.prose){position:static}}

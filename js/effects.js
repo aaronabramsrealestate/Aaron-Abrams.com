@@ -1,5 +1,5 @@
 /*!
- * Ricky Heidt site motion layer
+ * Aaron Abrams site motion layer
  * Parallax coastal scene, cursor reactive particles (sea spray at sunset,
  * bioluminescence at night), scroll choreography, magnetic buttons.
  * Everything is progressive enhancement: with JS off or reduced motion on,
