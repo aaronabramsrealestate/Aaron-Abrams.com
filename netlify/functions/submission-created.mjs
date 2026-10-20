@@ -101,7 +101,7 @@ export default async (req) => {
       console.error(`Follow Up Boss error ${res.status}: ${text.slice(0, 500)}`);
       return new Response('FUB error', { status: 502 });
     }
-    console.log(`Lead sent to Follow Up Boss (${res.status}) for ${event.person.firstName} ${event.person.lastName}`);
+    console.log(`Lead sent to Follow Up Boss (${res.status}), form: ${payload.form_name || "contact"}`);
     return new Response('OK');
   } catch (err) {
     console.error('Could not reach Follow Up Boss:', err && err.message);
