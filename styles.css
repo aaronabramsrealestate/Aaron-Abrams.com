@@ -902,3 +902,12 @@ html.scroll-locked{overflow:hidden;padding-right:var(--sbw,0)}
 .cta-band{background:linear-gradient(120deg,#0a0a0a,#1a7699 70%,#2596be)}
 .h-pl{background:linear-gradient(140deg,#dcf0f7,#2596be 50%,#0a2a36)}
 .wl{opacity:calc(.8 + var(--night) * .2)}
+
+/* real logo */
+.brand{flex-direction:row;align-items:center;gap:11px}
+.brand .brand-mark{height:34px;width:auto;display:block}
+.brand b.bt{display:flex;flex-direction:column;font-weight:400;line-height:1.1}
+.foot-logo{display:inline-block}
+.foot-logo img{width:220px;height:auto}
+.portrait img{object-position:50% 22%}
+@media (max-width:420px){.brand .brand-mark{height:30px}}

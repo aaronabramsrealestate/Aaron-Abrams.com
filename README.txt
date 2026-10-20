@@ -23,10 +23,10 @@ STILL TO CONFIRM OR SUPPLY BEFORE LAUNCH
      social share tags, sitemap.xml, robots.txt, and the Follow Up Boss lead source in
      netlify/functions/submission-created.mjs). If the real domain is different,
      find and replace "aaronabrams.com" across the repo.
-  2. Photos and logo. images/aaron-abrams-portrait.jpg, images/aaron-abrams-logo-light.png,
-     and images/aaron-abrams-logo-dark.png are placeholders. Replace them with the real
-     files using the same names. images/og-image.jpg (the link preview image) and the
-     favicons are simple "AA" placeholders and should be replaced with branded versions.
+  2. Photos and logo. The real headshots and logo are in images/ (aaron-abrams-portrait.jpg,
+     aaron-abrams-portrait-2.jpg, aaron-abrams-logo-light.png, aaron-abrams-logo-dark.png, and
+     the AA monogram aaron-abrams-mark*.png). The favicons and the link preview image
+     (images/og-image.jpg) were generated from the logo and can be swapped for designed versions.
   3. Scheduling link. "Schedule a Consultation" buttons go to the form on contact.html.
      If you want a booking calendar (for example Calendly), add the link and ask for the
      buttons to be switched over.
