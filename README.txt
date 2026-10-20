@@ -33,7 +33,7 @@ STILL TO CONFIRM OR SUPPLY BEFORE LAUNCH
      buttons to be switched over.
   4. Sales, listings and reviews. The sales data lives in data/transactions.json. To add or fix a sale,
      edit its entry there and run: python3 tools/build_sales.py (it rewrites sales.html, properties.html,
-     and the homepage cards). Fourteen of the 20 sales still need price, date, role, and photo details.
+     and the homepage cards). All 20 sales have a price and date; 3057 Walton Pl still needs a photo and a confirmed role.
      sales.html, properties.html, the homepage "Recently closed" section,
      and reviews.html were built from Aaron's public Zillow profile (the current listing and the 5
      most recent of the 20 sales Zillow reports, plus 4 review excerpts). Photos are linked from
