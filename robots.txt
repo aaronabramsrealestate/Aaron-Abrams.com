@@ -1,0 +1,26 @@
+# Welcome, search engines and AI assistants
+User-agent: *
+Allow: /
+Disallow: /thank-you.html
+Disallow: /guide-download.html
+Disallow: /downloads/
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: https://rickyheidt.com/sitemap.xml

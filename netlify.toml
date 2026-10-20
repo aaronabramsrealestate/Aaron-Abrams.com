@@ -1,0 +1,37 @@
+# Netlify settings
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+[[headers]]
+  for = "/downloads/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+
+# Styles and scripts: browsers check with Netlify on each visit and get a quick
+# "not modified" when nothing changed. A long fixed cache let returning visitors keep an
+# old stylesheet after an update (the new neighborhoods menu showed up unstyled).
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/js/*"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# Keep the links in the source exactly as written. Netlify's Pretty URLs
+# post-processing rewrites href="about.html" to href="/about", which no longer
+# matches the canonical tags and the sitemap (both use the .html address) and
+# splits the same page across two internal-link targets.
+[build.processing.html]
+  pretty_urls = false
+
+# The old Netlify address serves a complete second copy of the site. Send it to
+# the real domain so only one version can be crawled and linked to.
+[[redirects]]
+  from = "https://rickytherealtorsd.netlify.app/*"
+  to = "https://rickyheidt.com/:splat"
+  status = 301
+  force = true
