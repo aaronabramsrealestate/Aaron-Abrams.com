@@ -79,6 +79,10 @@ HERO ARTWORK
 - Four original scenes (Encinitas sign, Carlsbad coast and flower fields, vineyards, Point Loma and
   Shelter Island) live in js/scenes.js. One is drawn into the top of every page, and a different
   one is picked each time the page loads. Add ?scene=1 to 4 to the address to force one.
+- js/life.js animates each scene: traffic and pedestrians on the Encinitas street, beachgoers and
+  surfers at Carlsbad, grape pickers, a truck and a tractor in the vineyard, and boats, a kayaker and
+  a paddleboarder at Point Loma. It pauses when the hero is off screen and shows a still frame for
+  visitors who prefer reduced motion.
 
 MOTION AND EFFECTS
 - Animation libraries live in js/vendor (GSAP, ScrollTrigger, Lenis).

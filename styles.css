@@ -911,3 +911,5 @@ html.scroll-locked{overflow:hidden;padding-right:var(--sbw,0)}
 .foot-logo img{width:220px;height:auto}
 .portrait img{object-position:50% 22%}
 @media (max-width:420px){.brand .brand-mark{height:30px}}
+
+.hl{opacity:calc(.5 + var(--night, 0) * .5)}
