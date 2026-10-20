@@ -11,8 +11,8 @@ PAGES
   index.html            Home
   about.html            About Aaron
   buy.html, sell.html   Buyer and seller process
-  properties.html       Current listing, recent sales, and home search (IDX pending)
-  sales.html            Full sales and transactions page with Zillow reviews
+  properties.html       Current listing and home search (IDX pending)
+  sales.html            Market trends (data/market.json), current listing, and Zillow reviews
   investment.html       Investment and property potential
   neighborhoods.html    Interactive map and all community guides (one page per community)
   resources.html        Practical guides
@@ -33,17 +33,12 @@ STILL TO CONFIRM OR SUPPLY BEFORE LAUNCH
      If that Calendly event is ever switched off or loses its calendar connection, visitors see
      "This calendar is currently unavailable", so keep the event on and the calendar connected.
      The two web forms (contact and home-value) are the backup way to reach Aaron.
-  4. Sales, listings and reviews. The sales data lives in data/transactions.json. To add or fix a sale,
-     edit its entry there and run: python3 tools/build_sales.py (it rewrites sales.html, properties.html,
-     the homepage cards, and the "Homes I've helped clients buy and sell" section on each
-     community page). Each sale's "community" field names the community page it appears on
-     (for example "oceanside"), or null. All 20 sales have a price and date; 3057 Walton Pl
-     still needs a photo and a confirmed role.
-     sales.html, properties.html, the homepage "Recently closed" section,
-     and reviews.html were built from Aaron's public Zillow profile (the current listing and the 5
-     most recent of the 20 sales Zillow reports, plus 4 review excerpts). Photos are linked from
-     Zillow and credited to the listing brokerages. To refresh or add older sales, ask Claude, or
-     send the addresses. Confirm photo permissions for any listing images.
+  4. Market numbers, listings and reviews. Aaron's closed sales and production totals are NOT shown
+     on the site (he will show them once he reaches $50M in production). The sales.html "Market Trends"
+     page, the numbers band on the homepage and properties page, and the current listing cards come from
+     data/market.json (county figures, update monthly from SDAR/MLS reports) and the liveListings and
+     zillowTotals in data/transactions.json. After editing, run: python3 tools/build_sales.py
+     The closed-sale records stay in data/transactions.json, unused, for later.
   5. MLS / IDX. properties.html says a search will be added once an approved MLS/IDX
      service is connected. Update it when that happens.
   6. Brokerage disclosures and branding. Confirm the footer text and any team branding

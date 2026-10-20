@@ -1,0 +1,22 @@
+{
+ "asOf": "September 2026",
+ "scope": "San Diego County",
+ "medianPrice": 910000,
+ "medianPriceYoY": 1.7,
+ "detachedMedian": 1079000,
+ "detachedYoY": 5.8,
+ "attachedMedian": 670000,
+ "attachedYoY": -0.2,
+ "daysOnMarket": 39,
+ "daysOnMarketLastYear": 41,
+ "activeListings": 5684,
+ "activeListingsYoY": -4.8,
+ "monthsOfSupply": 3.0,
+ "closedSalesYoY": -14,
+ "pendingSalesYoY": -16,
+ "sources": [
+  {"label": "San Diego Association of REALTORS market data", "url": "https://sdar.stats.10kresearch.com/docs/hso/x/report"},
+  {"label": "San Diego market report, September 2026", "url": "https://robertschantz.substack.com/p/san-diego-real-estate-housing-market-d66"},
+  {"label": "San Diego price trends, October 2026", "url": "https://www.dawnsellssandiego.com/blog/are-san-diego-home-prices-increasing-or-decreasing-2026-october/"}
+ ]
+}
