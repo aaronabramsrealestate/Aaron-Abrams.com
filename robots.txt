@@ -2,6 +2,8 @@
 User-agent: *
 Allow: /
 Disallow: /thank-you.html
+Disallow: /data/
+Disallow: /tools/
 
 User-agent: GPTBot
 Allow: /

@@ -31,7 +31,10 @@ STILL TO CONFIRM OR SUPPLY BEFORE LAUNCH
   3. Scheduling link. "Schedule a Consultation" buttons go to the form on contact.html.
      If you want a booking calendar (for example Calendly), add the link and ask for the
      buttons to be switched over.
-  4. Sales, listings and reviews. sales.html, properties.html, the homepage "Recently closed" section,
+  4. Sales, listings and reviews. The sales data lives in data/transactions.json. To add or fix a sale,
+     edit its entry there and run: python3 tools/build_sales.py (it rewrites sales.html, properties.html,
+     and the homepage cards). Fourteen of the 20 sales still need price, date, role, and photo details.
+     sales.html, properties.html, the homepage "Recently closed" section,
      and reviews.html were built from Aaron's public Zillow profile (the current listing and the 5
      most recent of the 20 sales Zillow reports, plus 4 review excerpts). Photos are linked from
      Zillow and credited to the listing brokerages. To refresh or add older sales, ask Claude, or
