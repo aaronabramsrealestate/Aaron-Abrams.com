@@ -7,6 +7,8 @@ It rewrites the regions between <!-- name:start --> and <!-- name:end --> marker
   sales.html       sales:main    stats, charts, a card for every sale, and the full table
   properties.html  live, recent  current listing and the latest sales
   index.html       recent        the "Recently closed" cards
+  index.html,      metrics       the headline numbers band under the banner
+  properties.html
   <community>.html area-sales    the sales in that community, on its community guide page
 
 To add or correct a sale, edit its entry in data/transactions.json and run this again.
@@ -158,6 +160,37 @@ def last_12_months(rows):
 FEATURED = 5  # latest closed sales shown before "Show all"
 
 
+def metrics():
+    priced = [t for t in TX if t.get('soldPrice')]
+    prices = [t['soldPrice'] for t in priced]
+    return dict(total=len(TX), vol=short_money(sum(prices)), l12=last_12_months(priced),
+                med=short_money(statistics.median(prices)), rating='%.1f' % Z['rating'], rc=Z['reviewCount'], live=len(LIVE))
+
+
+def scorecard():
+    """Aaron's headline numbers, shown first on the track record page."""
+    m = metrics()
+    return ('<div class="stat-row six" data-stagger>'
+            '<div class="stat"><b>%(total)d</b><span>homes closed</span></div>'
+            '<div class="stat"><b>%(vol)s</b><span>in total sales</span></div>'
+            '<div class="stat"><b>%(l12)d</b><span>closed in the last 12 months</span></div>'
+            '<div class="stat"><b>%(med)s</b><span>median sale price</span></div>'
+            '<a class="stat" href="#reviews"><b>%(rating)s<em>&#9733;</em></b><span>%(rc)d Zillow reviews</span></a>'
+            '<a class="stat" href="#for-sale"><b>%(live)d</b><span>for sale now</span></a>'
+            '</div>') % m
+
+
+def metrics_band():
+    """The short version of the scorecard, right under the homepage and properties banners."""
+    m = metrics()
+    return ('<a class="metrics-band" href="sales.html">'
+            '<span class="mb-item"><b>%(total)d</b>homes closed</span>'
+            '<span class="mb-item"><b>%(vol)s</b>in total sales</span>'
+            '<span class="mb-item"><b>%(l12)d</b>closed in the last 12 months</span>'
+            '<span class="mb-item"><b>%(rating)s&#9733;</b>from %(rc)d Zillow reviews</span>'
+            '<span class="mb-go">See the full track record <span aria-hidden="true">&rarr;</span></span></a>') % m
+
+
 def main_region():
     priced = [t for t in TX if t.get('soldPrice')]
     prices = [t['soldPrice'] for t in priced]
@@ -187,8 +220,8 @@ def main_region():
              ''.join('<button class="chip" data-filter="%s">%s</button>' % (E(c), E(c)) for c in sorted(cities_in_order, key=lambda c: -count_city(c))[:4]))
     # Cards: the current listing and every sale with a photo. Newest few show first, the rest open with "Show all".
     carded = [t for t in TX if t.get('photoUrl')]
-    card_html = [live_card(p) for p in LIVE] + [sold_card(t) for t in carded]
-    first = len(LIVE) + FEATURED
+    card_html = [sold_card(t) for t in carded]
+    first = FEATURED
     cards = ''.join(c if i < first else c.replace('<article class="sale"', '<article class="sale later"', 1) for i, c in enumerate(card_html))
     more = len(card_html) - first
     rows = ''
@@ -200,14 +233,22 @@ def main_region():
             ('{:,} sq ft'.format(t['sqft']) if t.get('sqft') else ''))
     area_pills = ''.join('<li><b>%d</b> %s</li>' % (v, E(k)) for k, v in city_rows)
     return '''<section><div class="wrap">
-<div class="stat-row" data-stagger>
-<div class="stat"><b>%(total)d</b><span>closed sales</span></div>
-<div class="stat"><b>%(vol)s</b><span>in total sales volume</span></div>
-<div class="stat"><b>%(l12)d</b><span>homes closed in the last 12 months</span></div>
-<div class="stat"><b>%(rating)s<em>&#9733;</em></b><span>on Zillow, %(rc)d client reviews</span></div>
-</div>
+%(scorecard)s
+<nav class="jump" aria-label="On this page"><a href="#for-sale">For sale now</a><a href="#sold">Sold homes</a><a href="#numbers">The numbers</a><a href="#reviews">Reviews</a></nav>
 
-<div class="section-head" style="margin-top:64px"><span class="eyebrow">The track record</span><h2>Busier every year</h2><p>A snapshot of Aaron&rsquo;s closed sales: how the business is growing, what Aaron sells, and who he works with.</p></div>
+<div class="section-head" id="for-sale" style="margin-top:56px"><span class="eyebrow">Current listings</span><h2>For sale now</h2></div>
+<div class="grid g3 sales-grid live-grid">%(livecards)s</div>
+
+<div class="section-head" id="sold" style="margin-top:64px"><span class="eyebrow">Closed sales</span><h2>Recently sold</h2></div>
+<div class="chips" role="group" aria-label="Filter sales">%(chips)s</div>
+<div class="grid g3 sales-grid" data-filterable data-stagger>%(cards)s</div>
+<p class="more-wrap"><button class="btn btn-light more-btn" type="button" data-more>Show all %(ncards)d closed sales</button></p>
+
+<details class="tx-details"><summary>View every closed sale as a list</summary>
+<div class="tx-wrap"><table class="tx"><thead><tr><th>Property</th><th>Closed</th><th>Sold price</th><th>Represented</th><th>Size</th></tr></thead><tbody>%(rows)s</tbody></table></div></details>
+<p class="note" style="margin-top:22px">Closed sales on Aaron Abrams&rsquo;s <a href="%(z)s" target="_blank" rel="noopener">Zillow profile</a>, in which he represented the buyer, the seller, or both. Closed prices are public record, and prices, dates and details come from the San Diego MLS, Redfin and Zillow. The %(total)d sales add up to %(volfull)s, an average of %(avgfull)s. Anything marked &ldquo;For sale now&rdquo; is a current listing, not a closed sale. Listing photos are courtesy of the listing brokerages. Data as of %(asof)s.</p>
+
+<div class="section-head" id="numbers" style="margin-top:64px"><span class="eyebrow">The numbers</span><h2>Busier every year</h2><p>How the business is growing, what Aaron sells, and who he works with.</p></div>
 <div class="dash">
 <div class="insight dash-year"><h3>Closings per year</h3>%(yearcols)s</div>
 <div class="insight dash-price"><h3>Typical home</h3>
@@ -217,20 +258,12 @@ def main_region():
 <div class="insight dash-side"><h3>Buyers and sellers</h3><p class="seg-cap">Who Aaron represented</p>%(sideseg)s<p class="insight-note">Aaron works both sides of the table.</p></div>
 <div class="insight dash-where"><h3>Where Aaron closes</h3><ul class="pills">%(areas)s</ul></div>
 </div>
-
-<div class="section-head" style="margin-top:64px"><span class="eyebrow">Homes</span><h2>Recent sales and current listing</h2></div>
-<div class="chips" role="group" aria-label="Filter sales">%(chips)s</div>
-<div class="grid g3 sales-grid" data-stagger>%(cards)s</div>
-<p class="more-wrap"><button class="btn btn-light more-btn" type="button" data-more>Show all %(ncards)d closed sales</button></p>
-
-<details class="tx-details"><summary>View every closed sale as a list</summary>
-<div class="tx-wrap"><table class="tx"><thead><tr><th>Property</th><th>Closed</th><th>Sold price</th><th>Represented</th><th>Size</th></tr></thead><tbody>%(rows)s</tbody></table></div></details>
-<p class="note" style="margin-top:22px">Closed sales on Aaron Abrams&rsquo;s <a href="%(z)s" target="_blank" rel="noopener">Zillow profile</a>, in which he represented the buyer, the seller, or both. Closed prices are public record, and prices, dates and details come from the San Diego MLS, Redfin and Zillow. The %(total)d sales add up to %(volfull)s, an average of %(avgfull)s. Anything marked &ldquo;For sale now&rdquo; is a current listing, not a closed sale. Listing photos are courtesy of the listing brokerages. Data as of %(asof)s.</p>
 </div></section>
 ''' % dict(total=total, vol=short_money(volume), volfull=money(volume), avgfull=money(volume / len(prices)), l12=last_12_months(priced),
            rating='%.1f' % Z['rating'], rc=Z['reviewCount'], yearcols=columns(year_cols), med=money(med),
            medppsf='$%s' % '{:,}'.format(round(statistics.median(ppsf))), bandseg=segments(bands), sideseg=segments(side_rows),
-           areas=area_pills, chips=chips, cards=cards, ncards=len(carded), rows=rows,
+           areas=area_pills, chips=chips, cards=cards, ncards=len(carded), rows=rows, scorecard=scorecard(),
+           livecards=''.join(live_card(p) for p in LIVE) or '<p>No active listings right now. <a href="contact.html">Ask Aaron</a> about homes coming soon.</p>',
            asof=when({'soldDate': D['asOf']}, short=False), z=ZPROFILE)
 
 
@@ -264,6 +297,8 @@ if __name__ == '__main__':
     swap('properties.html', 'recent', '<div class="grid g3 sales-grid" data-stagger>%s</div>' % ''.join(sold_card(t, False) for t in carded[:3]))
     swap('index.html', 'recent', '<div class="grid g3 sales-grid" data-stagger>%s</div>' % (
         ''.join(live_card(p) for p in LIVE) + ''.join(sold_card(t, False) for t in carded[:2])))
+    swap('index.html', 'metrics', metrics_band())
+    swap('properties.html', 'metrics', metrics_band())
     areas = {}
     for t in TX:
         if t.get('community'): areas.setdefault(t['community'], []).append(t)
