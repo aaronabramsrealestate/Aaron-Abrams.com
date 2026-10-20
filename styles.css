@@ -293,7 +293,7 @@ html.fx-cursor input,html.fx-cursor textarea,html.fx-cursor select{cursor:auto}
 .marquee-row{display:flex;gap:.45em;white-space:nowrap;font-family:var(--serif);font-weight:600;font-size:clamp(3rem,9vw,8.5rem);line-height:1.05;will-change:transform}
 .marquee-row span{color:transparent;-webkit-text-stroke:1.5px var(--ocean)}
 .marquee-row.solid span{color:var(--sea);-webkit-text-stroke:0;opacity:.2}
-.marquee-row b{color:var(--coral);font-weight:400}
+.marquee-row b{color:var(--coral);font-weight:400;font-size:.32em;align-self:center}
 
 /* Horizontal gallery */
 .hgal{background:var(--ink);color:#fff;padding:90px 0;overflow:hidden;position:relative}
