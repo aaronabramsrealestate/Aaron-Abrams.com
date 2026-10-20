@@ -211,7 +211,7 @@ def metrics_band():
     """The short version of the team numbers, right under the homepage and properties banners."""
     t = M['team']
     return ('<a class="metrics-band" href="sales.html#team">'
-            '<span class="mb-item"><b>%d</b>PorchLight transaction sides in %d</span>'
+            '<span class="mb-item"><b>%d</b>buyers and sellers represented in %d</span>'
             '<span class="mb-item"><b>$%dM</b>team sales volume</span>'
             '<span class="mb-item"><b>#%d</b>team in San Diego</span>'
             '<span class="mb-item"><b>%.1f&#9733;</b>from %d Zillow reviews</span>'
@@ -221,7 +221,7 @@ def metrics_band():
 
 def main_region():
     sources = ', '.join('<a href="%s" target="_blank" rel="noopener">%s</a>' % (E(x['url']), E(x['label'])) for x in M['sources'])
-    price_rows = [('Houses', M['detachedMedian']), ('All homes', M['medianPrice']), ('Condos and townhomes', M['attachedMedian'])]
+    price_rows = [('Houses', M['detachedMedian']), ('All homes', M['medianPrice']), ('Condos', M['attachedMedian'])]
     dom_cols = [('Sep 2025', M['daysOnMarketLastYear'], 'days on market'), ('Sep 2026', M['daysOnMarket'], 'days on market')]
     change_rows = [('Median sale price', M['medianPriceYoY']), ('Active listings', M['activeListingsYoY']),
                    ('Closed sales', M['closedSalesYoY']), ('Pending sales', M['pendingSalesYoY'])]

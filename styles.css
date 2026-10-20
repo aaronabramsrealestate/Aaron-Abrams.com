@@ -1032,11 +1032,11 @@ a.stat:hover{transform:translateY(-2px);border-color:var(--sea)}
 @media (max-width:767px){.scene.scene-short{height:auto;min-height:56svh}}
 /* Headline numbers band right under the homepage and properties banners */
 .metrics-wrap{padding:28px 0 0}
-.metrics-band{display:grid;grid-template-columns:repeat(4,1fr) auto;align-items:center;gap:8px 18px;background:#fff;border:1px solid var(--line);border-radius:20px;padding:18px 24px;box-shadow:var(--shadow);text-decoration:none;color:var(--ink-soft);transition:border-color .2s ease}
+.metrics-band{display:grid;grid-template-columns:repeat(4,1fr) auto;align-items:start;gap:8px 18px;background:#fff;border:1px solid var(--line);border-radius:20px;padding:18px 24px;box-shadow:var(--shadow);text-decoration:none;color:var(--ink-soft);transition:border-color .2s ease}
 .metrics-band:hover{border-color:var(--sea)}
 .mb-item{display:flex;flex-direction:column;font-size:.88rem;line-height:1.35}
 .mb-item b{font-family:var(--serif);font-weight:600;font-size:clamp(1.4rem,2.2vw,1.9rem);color:var(--ocean);line-height:1.15}
-.mb-go{font-weight:600;color:var(--sea-text);white-space:nowrap;font-size:.95rem}
+.mb-go{align-self:center;font-weight:600;color:var(--sea-text);white-space:nowrap;font-size:.95rem}
 .metrics-band:hover .mb-go{text-decoration:underline}
 @media (max-width:860px){.metrics-band{grid-template-columns:repeat(2,1fr);padding:18px}.mb-go{grid-column:1/-1;margin-top:6px}}
 
