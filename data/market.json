@@ -15,8 +15,34 @@
  "closedSalesYoY": -14,
  "pendingSalesYoY": -16,
  "sources": [
-  {"label": "San Diego Association of REALTORS market data", "url": "https://sdar.stats.10kresearch.com/docs/hso/x/report"},
-  {"label": "San Diego market report, September 2026", "url": "https://robertschantz.substack.com/p/san-diego-real-estate-housing-market-d66"},
-  {"label": "San Diego price trends, October 2026", "url": "https://www.dawnsellssandiego.com/blog/are-san-diego-home-prices-increasing-or-decreasing-2026-october/"}
- ]
+  {
+   "label": "San Diego Association of REALTORS market data",
+   "url": "https://sdar.stats.10kresearch.com/docs/hso/x/report"
+  },
+  {
+   "label": "San Diego market report, September 2026",
+   "url": "https://robertschantz.substack.com/p/san-diego-real-estate-housing-market-d66"
+  },
+  {
+   "label": "San Diego price trends, October 2026",
+   "url": "https://www.dawnsellssandiego.com/blog/are-san-diego-home-prices-increasing-or-decreasing-2026-october/"
+  }
+ ],
+ "team": {
+  "name": "PorchLight Realty Group",
+  "dataYear": 2025,
+  "sides": 442,
+  "volume": 389340000,
+  "avgPrice": 880900,
+  "rankCityVolume": 2,
+  "rankCitySides": 2,
+  "rankStateVolume": 12,
+  "rankStateSides": 13,
+  "rankNationalVolume": 45,
+  "rankNationalSides": 91,
+  "source": {
+   "label": "RealTrends Verified, PorchLight Realty Group",
+   "url": "https://www.realtrends.com/team-profile/porchlight-realty-group-california-exp-realty/"
+  }
+ }
 }

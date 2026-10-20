@@ -33,7 +33,7 @@ STILL TO CONFIRM OR SUPPLY BEFORE LAUNCH
      If that Calendly event is ever switched off or loses its calendar connection, visitors see
      "This calendar is currently unavailable", so keep the event on and the calendar connected.
      The two web forms (contact and home-value) are the backup way to reach Aaron.
-  4. Market numbers, listings and reviews. Aaron's closed sales and production totals are NOT shown
+  4. Market numbers, listings and reviews. Aaron's own closed sales and production totals are NOT shown (the page shows PorchLight team figures from RealTrends instead, in data/market.json under "team")
      on the site (he will show them once he reaches $50M in production). The sales.html "Market Trends"
      page, the numbers band on the homepage and properties page, and the current listing cards come from
      data/market.json (county figures, update monthly from SDAR/MLS reports) and the liveListings and

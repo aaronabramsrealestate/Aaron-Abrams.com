@@ -166,10 +166,24 @@ def pct(n):
     return '%s%.1f%%' % ('+' if n > 0 else '-' if n < 0 else '', abs(n))
 
 
-def scorecard():
-    """Market headline numbers, shown first on the market page."""
+def team_scorecard():
+    """PorchLight team headline numbers (RealTrends Verified), shown first on the market page."""
+    t = M['team']
     return ('<div class="stat-row six" data-stagger>'
-            '<div class="stat"><b>%s</b><span>median sale price (%s)</span></div>'
+            '<div class="stat"><b>%d</b><span>transaction sides in %d</span></div>'
+            '<div class="stat"><b>%s</b><span>in sales volume</span></div>'
+            '<div class="stat"><b>%s</b><span>average sale price</span></div>'
+            '<div class="stat"><b>#%d</b><span>team in San Diego, by volume and sides</span></div>'
+            '<div class="stat"><b>#%d</b><span>in California, by volume</span></div>'
+            '<div class="stat"><b>#%d</b><span>in the U.S., by volume</span></div>'
+            '</div>') % (t['sides'], t['dataYear'], '$%dM' % round(t['volume'] / 1e6),
+                         short_money(t['avgPrice']), t['rankCityVolume'], t['rankStateVolume'], t['rankNationalVolume'])
+
+
+def market_scorecard():
+    """County market headline numbers."""
+    return ('<div class="stat-row six" data-stagger>'
+            '<div class="stat"><b>%s</b><span>county median price (%s)</span></div>'
             '<div class="stat"><b>%s</b><span>median, houses (%s)</span></div>'
             '<div class="stat"><b>%s</b><span>median, condos and townhomes (%s)</span></div>'
             '<div class="stat"><b>%d</b><span>median days on market</span></div>'
@@ -180,14 +194,15 @@ def scorecard():
 
 
 def metrics_band():
-    """The short version of the scorecard, right under the homepage and properties banners."""
-    return ('<a class="metrics-band" href="sales.html#numbers">'
-            '<span class="mb-item"><b>%s</b>San Diego County median price</span>'
-            '<span class="mb-item"><b>%d</b>median days on market</span>'
-            '<span class="mb-item"><b>%.1f</b>months of supply</span>'
+    """The short version of the team numbers, right under the homepage and properties banners."""
+    t = M['team']
+    return ('<a class="metrics-band" href="sales.html#team">'
+            '<span class="mb-item"><b>%d</b>PorchLight transaction sides in %d</span>'
+            '<span class="mb-item"><b>$%dM</b>team sales volume</span>'
+            '<span class="mb-item"><b>#%d</b>team in San Diego</span>'
             '<span class="mb-item"><b>%.1f&#9733;</b>from %d Zillow reviews</span>'
-            '<span class="mb-go">See the market report <span aria-hidden="true">&rarr;</span></span></a>') % (
-        short_money(M['medianPrice']), M['daysOnMarket'], M['monthsOfSupply'], Z['rating'], Z['reviewCount'])
+            '<span class="mb-go">See the team and market report <span aria-hidden="true">&rarr;</span></span></a>') % (
+        t['sides'], t['dataYear'], round(t['volume'] / 1e6), t['rankCityVolume'], Z['rating'], Z['reviewCount'])
 
 
 def main_region():
@@ -198,13 +213,16 @@ def main_region():
                    ('Closed sales', M['closedSalesYoY']), ('Pending sales', M['pendingSalesYoY'])]
     changes = ''.join('<li><b>%s</b> %s</li>' % (pct(v), E(k)) for k, v in change_rows)
     return '''<section><div class="wrap">
-%(scorecard)s
-<nav class="jump" aria-label="On this page"><a href="#for-sale">For sale now</a><a href="#numbers">Market trends</a><a href="#reviews">Reviews</a></nav>
+<div class="section-head" id="team"><span class="eyebrow">PorchLight Realty Group</span><h2>The team behind your move</h2><p>Aaron works with PorchLight, one of the top-ranked teams in San Diego. Figures below are team results for %(teamyear)d.</p></div>
+%(teamcard)s
+<p class="note" style="margin-top:18px">Source: <a href="%(teamurl)s" target="_blank" rel="noopener">RealTrends Verified</a>, based on %(teamyear)d sales data for PorchLight Realty Group, eXp Realty. A transaction side is one buyer or seller represented in a closed sale. Team figures reflect the whole team, not any one agent.</p>
+<nav class="jump" aria-label="On this page"><a href="#team">The team</a><a href="#for-sale">For sale now</a><a href="#numbers">Market trends</a><a href="#reviews">Reviews</a></nav>
 
 <div class="section-head" id="for-sale" style="margin-top:56px"><span class="eyebrow">Current listings</span><h2>For sale now</h2></div>
 <div class="grid g3 sales-grid live-grid">%(livecards)s</div>
 
 <div class="section-head" id="numbers" style="margin-top:64px"><span class="eyebrow">PorchLight market report</span><h2>San Diego County, %(asof)s</h2><p>Where prices, pace and inventory are heading, so you can plan your move with real numbers.</p></div>
+%(marketcard)s
 <div class="dash">
 <div class="insight dash-year"><h3>Homes are selling a little faster</h3>%(domcols)s<p class="insight-note">Median days on market, countywide.</p></div>
 <div class="insight dash-price"><h3>Median sale price by home type</h3>%(pricebars)s<p class="insight-note">Houses are rising while condos and townhomes are flat.</p></div>
@@ -213,7 +231,7 @@ def main_region():
 </div>
 <p class="note" style="margin-top:22px">Countywide figures for %(asof)s, compiled from MLS-based market reports: %(sources)s. Sources round differently, so figures can vary slightly between reports. This is general market information, not a prediction, and individual neighborhoods and homes vary.</p>
 </div></section>
-''' % dict(scorecard=scorecard(), asof=M['asOf'], domcols=columns(dom_cols), pricebars=bars(price_rows, fmt=lambda v: short_money(v)),
+''' % dict(teamcard=team_scorecard(), marketcard=market_scorecard(), teamyear=M['team']['dataYear'], teamurl=E(M['team']['source']['url']), asof=M['asOf'], domcols=columns(dom_cols), pricebars=bars(price_rows, fmt=lambda v: short_money(v)),
            changes=changes, supply=M['monthsOfSupply'], sources=sources,
            livecards=''.join(live_card(p) for p in LIVE) or '<p>No active listings right now. <a href="contact.html">Ask Aaron</a> about homes coming soon.</p>')
 
