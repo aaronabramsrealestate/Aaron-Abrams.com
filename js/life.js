@@ -75,8 +75,16 @@
     sa(this.up, 'transform', 'rotate(' + f1(p.lean || 0) + ' 0 -13)');
     sa(this.legA, 'transform', 'rotate(' + f1(p.legA || 0) + ' 0 -13)');
     sa(this.legB, 'transform', 'rotate(' + f1(p.legB || 0) + ' 0 -13)');
-    sa(this.armA, 'transform', 'rotate(' + f1(p.armA === undefined ? 4 : p.armA) + ' 0 -22)');
+    // someone carrying a surfboard keeps the front arm wrapped around it instead of swinging it
+    var armA = this.carrying ? -16 : (p.armA === undefined ? 4 : p.armA);
+    sa(this.armA, 'transform', 'rotate(' + f1(armA) + ' 0 -22)');
     sa(this.armB, 'transform', 'rotate(' + f1(p.armB === undefined ? -4 : p.armB) + ' 0 -22)');
+  };
+  // Tuck a board under the front arm: the board is drawn behind that arm (so the hand reaches over
+  // its rail) and the arm stops swinging while it is carried.
+  Person.prototype.carryBoard = function (on) {
+    this.carrying = on !== false;
+    if (this.carrying) this.up.insertBefore(this.hold, this.armA);
   };
   Person.prototype.at = function (x, y, s, dir) {
     sa(this.g, 'transform', 'translate(' + f1(x) + ' ' + f1(y) + ') scale(' + f1(dir < 0 ? -s : s).replace(/(\.\d)$/, '$1') + ' ' + f1(s) + ')');
@@ -417,9 +425,10 @@
       addWalker(820, 1400, 28, 10, 0, { shirt: '#5b8a6a' });
       var bw = addWalker(560, 1100, 62, 13, 0, { shirt: '#2a3550' });      // walking out with a board
       var bb = el('ellipse', { cx: 3, cy: -17, rx: 2.3, ry: 17, fill: '#ffd84a', transform: 'rotate(-8 3 -17)' }, bw.p.hold);
-      sa(bw.p.hold, 'opacity', 1);
+      sa(bw.p.hold, 'opacity', 1); bw.p.carryBoard();
       var bw2 = addWalker(980, 1420, 14, 11, 0, { shirt: '#c45a4a' });
       el('ellipse', { cx: 3, cy: -17, rx: 2.3, ry: 17, fill: '#2596be', transform: 'rotate(-8 3 -17)' }, bw2.p.hold);
+      bw2.p.carryBoard();
     }
     walkers[1].couple = walkers[0];
     // the dog
@@ -748,6 +757,7 @@
       p.surf = Math.random() < 0.16;                         // someone carrying a surfboard
       p.p.g.setAttribute('class', '');
       sa(p.board, 'opacity', p.surf ? 1 : 0);
+      p.p.carryBoard(p.surf);
     }
     for (i = 0; i < np; i++) {
       var pp = new Person(g, { shirt: pick(SHIRT) });
