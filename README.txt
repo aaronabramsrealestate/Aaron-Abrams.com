@@ -28,9 +28,11 @@ STILL TO CONFIRM OR SUPPLY BEFORE LAUNCH
      aaron-abrams-portrait-2.jpg, aaron-abrams-logo-light.png, aaron-abrams-logo-dark.png, and
      the AA monogram aaron-abrams-mark*.png). The favicons and the link preview image
      (images/og-image.jpg) were generated from the logo and can be swapped for designed versions.
-  3. Scheduling link. "Schedule a Consultation" buttons go to the form on contact.html.
-     If you want a booking calendar (for example Calendly), add the link and ask for the
-     buttons to be switched over.
+  3. Scheduling link. Every "Schedule a Consultation" style button opens the booking calendar at
+     https://calendly.com/aaronabrams/sandiego in a popup, and contact.html also has the calendar built in.
+     If that Calendly event is ever switched off or loses its calendar connection, visitors see
+     "This calendar is currently unavailable", so keep the event on and the calendar connected.
+     The two web forms (contact and home-value) are the backup way to reach Aaron.
   4. Sales, listings and reviews. The sales data lives in data/transactions.json. To add or fix a sale,
      edit its entry there and run: python3 tools/build_sales.py (it rewrites sales.html, properties.html,
      and the homepage cards). All 20 sales have a price and date; 3057 Walton Pl still needs a photo and a confirmed role.
