@@ -143,7 +143,7 @@
     var g = el('g', {}, host);
 
     // truck, parked at the end of the rows
-    var tx = 790, truck = el('g', {}, g), crates = [], nCrates = 0, truckX = 0, truckState = 'parked', truckT = 0, wheels = [];
+    var tx = 790, truck = el('g', {}, g), crates = [], nCrates = 0, truckX = 0, truckState = 'parked', truckT = 0, wheels = [], driver;
     (function () {
       el('ellipse', { cx: 4, cy: 1, rx: 36, ry: 4, fill: '#05060f', opacity: 0.35 }, truck);
       var bed = el('g', {}, truck);
@@ -153,6 +153,11 @@
       el('rect', { x: -34, y: -23, width: 21, height: 14, rx: 2, fill: '#3b6b8a' }, truck);
       el('rect', { x: -42, y: -16, width: 10, height: 8, fill: '#2f566f' }, truck);
       el('rect', { x: -31, y: -21, width: 9, height: 7, fill: '#cfe3ee', opacity: 0.55 }, truck);
+      driver = el('g', { opacity: 0 }, truck);              // the hauler, once he is behind the wheel
+      el('rect', { x: -30.5, y: -15.2, width: 8, height: 3, rx: 1, fill: '#e8e2d0' }, driver);
+      el('circle', { cx: -26.5, cy: -17.6, r: 2.5, fill: '#e0b48f' }, driver);
+      el('ellipse', { cx: -26.5, cy: -19.6, rx: 4.2, ry: 1, fill: '#d9b66a' }, driver);
+      el('path', { d: 'M-28.8,-19.6 Q-26.5,-23.4 -24.2,-19.6 Z', fill: '#d9b66a' }, driver);
       el('rect', { x: -36, y: -12, width: 70, height: 3, fill: '#1c2a3a' }, truck);
       [-26, 18].forEach(function (cx) {
         var w = el('g', { transform: 'translate(' + cx + ' -7)' }, truck);
@@ -237,7 +242,8 @@
     function setCrates(n) { nCrates = n; crates.forEach(function (c, i) { c.setAttribute('opacity', i < n ? 1 : 0); }); }
     function haulerUpdate(dt, t) {
       hc.t += dt;
-      var homeX = tx + truckX + 59, pose = { lean: 2, legA: 0, legB: 0, armA: 6, armB: -6 }, dir = 1, y;
+      var homeX = tx + truckX + 59, cabX = tx + truckX - 28 * truckS, pose = { lean: 2, legA: 0, legB: 0, armA: 6, armB: -6 }, dir = 1, y;
+      var face = (hc.state === 'out' || hc.state === 'lift') ? 1 : -1;
       if (hc.state === 'wait') {
         if (truckState !== 'parked') { hc.t = 0; }
         else if (hc.t > 1.2) {
@@ -267,12 +273,36 @@
         if (hc.t > 0.5 && hc.loaded) { hc.loaded = false; crate.setAttribute('opacity', 0); setCrates(Math.min(6, nCrates + 1)); }
         if (hc.t > 0.95) {
           hc.state = 'wait'; hc.t = -1.5;
-          if (nCrates >= 6) { truckState = 'leaving'; truckT = 0; }
+          if (nCrates >= 6) { hc.state = 'toCab'; hc.t = 0; }    // fully loaded: he drives it out himself
         }
+      } else if (hc.state === 'toCab') {
+        // walk forward along the truck to the driver's door
+        var u4 = clamp(hc.t / 3.4, 0, 1);
+        hc.x = homeX + (cabX - homeX) * sm(u4); face = -1;
+        pose = walkPose(hc.t * 8, false);
+        if (u4 >= 1) { hc.state = 'enter'; hc.t = 0; }
+      } else if (hc.state === 'enter') {
+        // a beat at the door, then he climbs in and the driver appears in the window
+        var k4 = clamp(hc.t / 0.8, 0, 1); hc.x = cabX; face = -1;
+        pose = { lean: 12 * k4, legA: 0, legB: 0, armA: -34 * k4, armB: -24 * k4 };
+        hauler.g.setAttribute('opacity', f1(1 - clamp((hc.t - 0.4) / 0.4, 0, 1)));
+        driver.setAttribute('opacity', f1(clamp((hc.t - 0.5) / 0.4, 0, 1)));
+        if (hc.t > 0.9) { hc.state = 'away'; hc.t = 0; hauler.g.setAttribute('opacity', 0); truckState = 'leaving'; truckT = 0; }
+      } else if (hc.state === 'away') {
+        // he is in the truck: nothing to draw until the next truck has parked
+        hc.x = cabX; hauler.g.setAttribute('opacity', 0);
+        if (truckState === 'parked') { hc.state = 'exit'; hc.t = 0; driver.setAttribute('opacity', 0); }
+      } else if (hc.state === 'exit') {
+        // out of the cab and back to the tailgate for the next load
+        var u5 = clamp(hc.t / 3.4, 0, 1);
+        hc.x = cabX + (homeX - cabX) * sm(u5); face = 1;
+        pose = walkPose(hc.t * 8, false);
+        hauler.g.setAttribute('opacity', f1(clamp(hc.t / 0.4, 0, 1)));
+        if (u5 >= 1) { hc.state = 'wait'; hc.t = -1.5; hauler.g.setAttribute('opacity', 1); }
       }
       if (hc.state === 'wait' || hc.state === 'load') hc.x = homeX;
       y = Y1(hc.x) + 3;
-      hauler.pose(pose); hauler.at(hc.x, y, 1.45, (hc.state === 'out' || hc.state === 'lift') ? 1 : -1);
+      hauler.pose(pose); hauler.at(hc.x, y, 1.45, face);
     }
 
     // tractor
