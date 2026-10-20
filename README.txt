@@ -75,6 +75,11 @@ AFTER LAUNCH
 - Bing Webmaster Tools: import from Search Console.
 - Update the website link on Zillow, Instagram, LinkedIn, and Google Business Profile.
 
+HERO ARTWORK
+- Four original scenes (Encinitas sign, Carlsbad coast and flower fields, vineyards, Point Loma and
+  Shelter Island) live in js/scenes.js. One is drawn into the top of every page, and a different
+  one is picked each time the page loads. Add ?scene=1 to 4 to the address to force one.
+
 MOTION AND EFFECTS
 - Animation libraries live in js/vendor (GSAP, ScrollTrigger, Lenis).
 - All motion code is in js/effects.js. Visitors with "reduce motion" turned on get a

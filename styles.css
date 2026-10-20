@@ -901,3 +901,4 @@ html.scroll-locked{overflow:hidden;padding-right:var(--sbw,0)}
 
 .cta-band{background:linear-gradient(120deg,#0a0a0a,#1a7699 70%,#2596be)}
 .h-pl{background:linear-gradient(140deg,#dcf0f7,#2596be 50%,#0a2a36)}
+.wl{opacity:calc(.8 + var(--night) * .2)}
