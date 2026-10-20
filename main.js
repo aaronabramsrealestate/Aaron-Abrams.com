@@ -54,7 +54,7 @@ window.__track=function(name,params){ if(window.gtag) window.gtag('event',name,p
 (function(){
   var t=document.querySelector('.menu-toggle'),m=document.getElementById('menu');
   if(t&&m){
-    var wide=window.matchMedia('(min-width: 861px)'), pushed=false, goTo=null;
+    var wide=window.matchMedia('(min-width: 1141px)'), pushed=false, goTo=null;
     // The open menu holds one history entry, so the back button closes it like the other overlays.
     var set=function(o){
       if(o===m.classList.contains('open')) return;
@@ -152,18 +152,18 @@ window.__track=function(name,params){ if(window.gtag) window.gtag('event',name,p
   chips.forEach(function(c){ c.addEventListener('click',function(){
     chips.forEach(function(x){x.classList.toggle('on',x===c);});
     var f=c.getAttribute('data-filter');
-    var grid=document.querySelector('.sales-grid'), moreWrap=document.querySelector('.more-wrap');
+    var grid=document.querySelector('.sales-grid[data-filterable]')||document.querySelector('.sales-grid'), moreWrap=document.querySelector('.more-wrap');
     // Filtering searches every sale; "All" goes back to the short list unless Show all was pressed.
     if(grid) grid.classList.toggle('open', f!=='all' || grid.getAttribute('data-expanded')==='1');
     if(moreWrap) moreWrap.hidden = f!=='all' || (grid && grid.getAttribute('data-expanded')==='1');
-    document.querySelectorAll('.sales-grid .sale').forEach(function(s){
+    if(grid) grid.querySelectorAll('.sale').forEach(function(s){
       s.hidden = !(f==='all' || s.getAttribute('data-area')===f || s.getAttribute('data-role')===f);
     });
     if(window.ScrollTrigger) window.ScrollTrigger.refresh();
   });});
   var moreBtn=document.querySelector('[data-more]');
   if(moreBtn) moreBtn.addEventListener('click',function(){
-    var grid=document.querySelector('.sales-grid'); grid.classList.add('open'); grid.setAttribute('data-expanded','1');
+    var grid=document.querySelector('.sales-grid[data-filterable]')||document.querySelector('.sales-grid'); grid.classList.add('open'); grid.setAttribute('data-expanded','1');
     moreBtn.parentNode.hidden=true;
     if(window.ScrollTrigger) window.ScrollTrigger.refresh();
   });
