@@ -166,18 +166,32 @@ def pct(n):
     return '%s%.1f%%' % ('+' if n > 0 else '-' if n < 0 else '', abs(n))
 
 
-def team_scorecard():
-    """PorchLight team headline numbers (RealTrends Verified), shown first on the market page."""
+def team_proof(heading_tag='h2'):
+    """Full-width feature section with the PorchLight team numbers (RealTrends Verified)."""
     t = M['team']
-    return ('<div class="stat-row six" data-stagger>'
-            '<div class="stat"><b>%d</b><span>transaction sides in %d</span></div>'
-            '<div class="stat"><b>%s</b><span>in sales volume</span></div>'
-            '<div class="stat"><b>%s</b><span>average sale price</span></div>'
-            '<div class="stat"><b>#%d</b><span>team in San Diego, by volume and sides</span></div>'
-            '<div class="stat"><b>#%d</b><span>in California, by volume</span></div>'
-            '<div class="stat"><b>#%d</b><span>in the U.S., by volume</span></div>'
-            '</div>') % (t['sides'], t['dataYear'], '$%dM' % round(t['volume'] / 1e6),
-                         short_money(t['avgPrice']), t['rankCityVolume'], t['rankStateVolume'], t['rankNationalVolume'])
+    vol = round(t['volume'] / 1e6)
+    stat = lambda n, label, attrs='': '<div class="tp-stat"><b%s>%s</b><span>%s</span></div>' % (attrs, n, label)
+    return ('''<section class="team-proof" id="team"><div class="wrap">
+<div class="tp-head"><span class="eyebrow">Backed by a top San Diego team</span>
+<h2>You get Aaron, and a team ranked #%(city)d in San Diego behind him</h2>
+<p>Aaron is part of PorchLight Realty Group, which represented %(sides)d buyers and sellers in %(year)d. That experience shows up in your pricing, your negotiation and your timeline.</p></div>
+<div class="tp-grid">
+<div class="tp-rank"><span>San Diego team ranking</span><b>#%(city)d</b><em>by sales volume and by transactions, %(year)d</em></div>
+<div class="tp-stats">
+%(s1)s%(s2)s%(s3)s%(s4)s
+</div></div>
+<ul class="tp-points">
+<li><b>Current market knowledge.</b> Having represented %(sides)d buyers and sellers in a year, the team sees what is really selling and for how much, every week.</li>
+<li><b>Experience at real San Diego prices.</b> About $%(vol)dM in sales, with an average home price of %(avg)s, close to the county median.</li>
+<li><b>Personal service, team strength.</b> You work with Aaron directly, with a nationally ranked team behind every offer and every listing.</li>
+</ul>
+<div class="btn-row"><a class="btn btn-coral" href="https://calendly.com/aaronabrams/sandiego" data-calendly="https://calendly.com/aaronabrams/sandiego" target="_blank" rel="noopener">Let&rsquo;s Talk About Your Goals</a><a class="btn btn-light" href="sales.html#numbers">See the market report</a></div>
+<p class="tp-note">Source: <a href="%(url)s" target="_blank" rel="noopener">RealTrends Verified</a>, %(year)d sales data for PorchLight Realty Group, eXp Realty. A transaction side is one buyer or seller represented in a closed sale. Figures are for the whole team, of which Aaron is a part.</p>
+</div></section>''') % dict(city=t['rankCityVolume'], sides=t['sides'], year=t['dataYear'], vol=vol, avg=short_money(t['avgPrice']), url=E(t['source']['url']),
+        s1=stat(t['sides'], 'buyers and sellers represented', ' data-count="%d"' % t['sides']),
+        s2=stat('$%dM' % vol, 'in sales volume', ' data-count="%d" data-prefix="$" data-suffix="M"' % vol),
+        s3=stat('#%d' % t['rankStateVolume'], 'team in California, by volume', ' data-count="%d" data-prefix="#"' % t['rankStateVolume']),
+        s4=stat('#%d' % t['rankNationalVolume'], 'team in the U.S., by volume', ' data-count="%d" data-prefix="#"' % t['rankNationalVolume']))
 
 
 def market_scorecard():
@@ -213,9 +227,6 @@ def main_region():
                    ('Closed sales', M['closedSalesYoY']), ('Pending sales', M['pendingSalesYoY'])]
     changes = ''.join('<li><b>%s</b> %s</li>' % (pct(v), E(k)) for k, v in change_rows)
     return '''<section><div class="wrap">
-<div class="section-head" id="team"><span class="eyebrow">PorchLight Realty Group</span><h2>The team behind your move</h2><p>Aaron works with PorchLight, one of the top-ranked teams in San Diego. Figures below are team results for %(teamyear)d.</p></div>
-%(teamcard)s
-<p class="note" style="margin-top:18px">Source: <a href="%(teamurl)s" target="_blank" rel="noopener">RealTrends Verified</a>, based on %(teamyear)d sales data for PorchLight Realty Group, eXp Realty. A transaction side is one buyer or seller represented in a closed sale. Team figures reflect the whole team, not any one agent.</p>
 <nav class="jump" aria-label="On this page"><a href="#team">The team</a><a href="#for-sale">For sale now</a><a href="#numbers">Market trends</a><a href="#reviews">Reviews</a></nav>
 
 <div class="section-head" id="for-sale" style="margin-top:56px"><span class="eyebrow">Current listings</span><h2>For sale now</h2></div>
@@ -231,7 +242,7 @@ def main_region():
 </div>
 <p class="note" style="margin-top:22px">Countywide figures for %(asof)s, compiled from MLS-based market reports: %(sources)s. Sources round differently, so figures can vary slightly between reports. This is general market information, not a prediction, and individual neighborhoods and homes vary.</p>
 </div></section>
-''' % dict(teamcard=team_scorecard(), marketcard=market_scorecard(), teamyear=M['team']['dataYear'], teamurl=E(M['team']['source']['url']), asof=M['asOf'], domcols=columns(dom_cols), pricebars=bars(price_rows, fmt=lambda v: short_money(v)),
+''' % dict(marketcard=market_scorecard(), asof=M['asOf'], domcols=columns(dom_cols), pricebars=bars(price_rows, fmt=lambda v: short_money(v)),
            changes=changes, supply=M['monthsOfSupply'], sources=sources,
            livecards=''.join(live_card(p) for p in LIVE) or '<p>No active listings right now. <a href="contact.html">Ask Aaron</a> about homes coming soon.</p>')
 
@@ -251,6 +262,8 @@ if __name__ == '__main__':
     swap('properties.html', 'live', '<div class="grid g3 sales-grid">%s</div>' % ''.join(live_card(p) for p in LIVE))
     swap('index.html', 'recent', '<div class="grid g3 sales-grid" data-stagger>%s</div>' % ''.join(live_card(p) for p in LIVE))
     swap('index.html', 'metrics', metrics_band())
+    for page in ('index.html', 'about.html', 'sales.html'):
+        swap(page, 'team', team_proof())
     swap('properties.html', 'metrics', metrics_band())
     for slug in AREA_PAGES:
         swap(slug + '.html', 'area-sales', '')
