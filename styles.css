@@ -1028,7 +1028,8 @@ a.stat:hover{transform:translateY(-2px);border-color:var(--sea)}
 .jump a:hover{border-color:var(--sea);color:var(--sea-text)}
 [id="for-sale"],[id="sold"],[id="numbers"],[id="reviews"]{scroll-margin-top:96px}
 /* Track record page: a shorter banner so the numbers show without scrolling */
-.scene.scene-short{height:58vh;min-height:460px}
+.scene.scene-short{height:auto;min-height:max(58vh,460px)}
+.scene-short .scene-content{padding-bottom:120px}
 @media (max-width:767px){.scene.scene-short{height:auto;min-height:56svh}}
 /* Headline numbers band right under the homepage and properties banners */
 .metrics-wrap{padding:28px 0 0}
