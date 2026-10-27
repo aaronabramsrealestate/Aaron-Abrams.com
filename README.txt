@@ -8,6 +8,9 @@ WHAT'S IN THIS REPOSITORY
   netlify.toml          Tells Netlify where the site and the connection live
 
 PAGES
+  Main menu: Buy (Buy, Properties, Invest), Sell (Sell, Home Value, Cash Offer), Communities,
+  Market Trends, Resources (Home Services, Guides, FAQ), Reviews, About, Contact. The menu and
+  footer are the same on every page, so change them on all pages at once.
   index.html            Home
   about.html            About Aaron
   buy.html, sell.html   Buyer and seller process
@@ -16,9 +19,9 @@ PAGES
   investment.html       Investment and property potential
   neighborhoods.html    Interactive map and all community guides (one page per community)
   resources.html        Practical guides
-  services.html         PorchLight partners (31 Beaches, Goosehead, Home Warranty of America),
+  services.html         Home Services: PorchLight partners (31 Beaches, Goosehead, Home Warranty of America),
                         vendor referrals, and selling as-is for a cash offer
-  reviews.html          Verified testimonials (empty until reviews are approved)
+  reviews.html          Client reviews from Zillow, plus Leave a Review buttons (Google and Zillow)
   faq.html, contact.html, home-value.html, thank-you.html, 404.html
 
 STILL TO CONFIRM OR SUPPLY BEFORE LAUNCH
