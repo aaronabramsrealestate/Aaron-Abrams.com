@@ -287,14 +287,20 @@ var LEAD_FORMS='form[name="contact"],form[name="home-value"]';
   });
 })();
 
-// Neighborhoods menu: on phones the list folds open from a button next to the link.
+// Dropdown menus (Buy, Sell, Communities, Resources): on phones each list folds open from a
+// button next to its link, and opening one closes the others.
 (function(){
-  var li=document.querySelector('.has-sub'), b=li&&li.querySelector('.sub-toggle');
-  if(!b) return;
-  b.addEventListener('click',function(){
-    var o=li.classList.toggle('open'); b.setAttribute('aria-expanded',o?'true':'false');
+  var items=[].slice.call(document.querySelectorAll('.has-sub'));
+  function close(li){ li.classList.remove('open'); var b=li.querySelector('.sub-toggle'); if(b) b.setAttribute('aria-expanded','false'); }
+  items.forEach(function(li){
+    var b=li.querySelector('.sub-toggle'); if(!b) return;
+    b.addEventListener('click',function(){
+      var o=!li.classList.contains('open');
+      items.forEach(close);
+      if(o){ li.classList.add('open'); b.setAttribute('aria-expanded','true'); }
+    });
   });
-  document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&li.classList.contains('open')){ li.classList.remove('open'); b.setAttribute('aria-expanded','false'); } });
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') items.forEach(close); });
 })();
 
 // Neighborhood directory: filter the cards as someone types.

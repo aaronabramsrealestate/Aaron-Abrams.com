@@ -185,7 +185,7 @@ def team_proof(heading_tag='h2'):
 <li><b>Experience at real San Diego prices.</b> About $%(vol)dM in sales, with an average home price of %(avg)s, close to the county median.</li>
 <li><b>Personal service, team strength.</b> You work with Aaron directly, with a nationally ranked team behind every offer and every listing.</li>
 </ul>
-<div class="btn-row"><a class="btn btn-coral" href="https://calendly.com/aaronabrams/sandiego" data-calendly="https://calendly.com/aaronabrams/sandiego" target="_blank" rel="noopener">Let&rsquo;s Talk About Your Goals</a><a class="btn btn-light" href="sales.html#numbers">See the market report</a></div>
+<div class="btn-row"><a class="btn btn-coral" href="https://calendly.com/aaronabrams/sandiego" data-calendly="https://calendly.com/aaronabrams/sandiego" target="_blank" rel="noopener">Schedule a Consultation</a><a class="btn btn-light" href="sales.html#numbers">See the market report</a></div>
 <p class="tp-note">Source: <a href="%(url)s" target="_blank" rel="noopener">RealTrends Verified</a>, %(year)d sales data for PorchLight Realty Group, eXp Realty. A transaction side is one buyer or seller represented in a closed sale. Figures are for the whole team, of which Aaron is a part.</p>
 </div></section>''') % dict(city=t['rankCityVolume'], sides=t['sides'], year=t['dataYear'], vol=vol, avg=short_money(t['avgPrice']), url=E(t['source']['url']),
         s1=stat(t['sides'], 'buyers and sellers represented', ' data-count="%d"' % t['sides']),
