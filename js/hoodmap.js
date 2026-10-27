@@ -19,7 +19,7 @@
     coast:   { name: 'North County Coast',    color: '#e2725b', blurb: 'Beach cities from Del Mar to Oceanside, linked by I-5 and the Coaster train.' },
     inland:  { name: 'North County Inland',   color: '#7f9d5a', blurb: 'Foothill and valley communities along SR-78, SR-76 and I-15, from Rancho Santa Fe and Poway to Fallbrook.' },
     central: { name: 'Central San Diego',     color: '#5668b3', blurb: 'The urban core and the neighborhoods around Downtown, Balboa Park and Mission Valley.' },
-    beach:   { name: 'Beach and Bay',         color: '#2596be', blurb: 'Ocean and bayfront neighborhoods from La Jolla south to Point Loma.' },
+    beach:   { name: 'Beach and Bay',         color: '#2596be', blurb: 'Ocean and bayfront communities from La Jolla south to Point Loma and Coronado.' },
     north:   { name: 'North City and Inland', color: '#d99a2b', blurb: 'The north side of the City of San Diego, from University City to Rancho Bernardo.' }
   };
   var ORDER = ['coast', 'inland', 'central', 'beach', 'north'];
@@ -32,8 +32,6 @@
   function path(arr, close) { return arr.map(function (p, i) { var q = P(p[0], p[1]); return (i ? 'L' : 'M') + q[0].toFixed(1) + ' ' + q[1].toFixed(1); }).join('') + (close ? 'Z' : ''); }
 
   var COAST = [[33.43, -117.64], [33.385, -117.595], [33.35, -117.545], [33.31, -117.50], [33.27, -117.435], [33.235, -117.405], [33.215, -117.395], [33.195, -117.385], [33.18, -117.362], [33.16, -117.355], [33.145, -117.347], [33.12, -117.335], [33.09, -117.312], [33.07, -117.31], [33.04, -117.298], [33.015, -117.283], [32.99, -117.272], [32.96, -117.266], [32.93, -117.262], [32.90, -117.258], [32.86, -117.262], [32.852, -117.272], [32.83, -117.28], [32.81, -117.278], [32.795, -117.258], [32.77, -117.255], [32.75, -117.255], [32.735, -117.256], [32.70, -117.25], [32.668, -117.243]];
-  // Coronado and North Island, drawn as land inside the bay.
-  var CORONADO = [[32.706, -117.226], [32.712, -117.205], [32.70, -117.172], [32.685, -117.16], [32.655, -117.148], [32.62, -117.133], [32.585, -117.122], [32.575, -117.118], [32.572, -117.126], [32.60, -117.135], [32.63, -117.145], [32.66, -117.165], [32.679, -117.178], [32.681, -117.20], [32.684, -117.222]];
   // San Diego Bay shoreline, from the bay side of Point Loma around to the South Bay. The bay is drawn as part of
   // the ocean, so the water flows past the tip of Point Loma the way the harbor entrance does.
   var BAY = [[32.6706, -117.2379], [32.70, -117.232], [32.716, -117.236], [32.72, -117.205], [32.714, -117.178], [32.70, -117.162], [32.67, -117.128], [32.64, -117.107], [32.612, -117.10], [32.58, -117.095]];
@@ -54,6 +52,7 @@
     ['LEGOLAND California', 33.1260, -117.3117, 'star', 1, ['carlsbad'], 'A family theme park in Carlsbad.'],
     ['Oceanside Pier', 33.1936, -117.3837, 'anchor', 0, ['oceanside'], 'The long wooden pier at the foot of downtown Oceanside.'],
     ['San Diego Zoo Safari Park', 33.0970, -116.9967, 'tree', 1, ['escondido'], 'A wildlife park in the San Pasqual Valley near Escondido.'],
+    ['Hotel del Coronado', 32.6809, -117.1786, 'star', 0, ['coronado'], 'The landmark 1888 beachfront resort on Coronado Beach.'],
     ['Cabrillo National Monument', 32.6736, -117.2410, 'anchor', 0, ['point-loma'], 'A national monument at the tip of Point Loma, with bay views and tide pools.']
   ].map(function (d, i) { var q = P(d[1], d[2]); return { i: i, n: d[0], x: q[0], y: q[1], icon: d[3], major: !!d[4], near: d[5], b: d[6] }; });
   var ICONS = {
@@ -90,8 +89,9 @@
   var gCells = svgNS('g', { 'clip-path': 'url(#hmcover)' }, svg);
   var oceanPts = [[34, -118.6]].concat(COAST).concat(BAY).concat([[32.40, -117.09], [32.40, -118.6]]);
   svgNS('path', { d: path(oceanPts, true), fill: 'url(#hmsea)' }, svg);
-  svgNS('path', { d: path(CORONADO, true), fill: '#ebe8e2' }, svg);
-  [path(COAST.concat(BAY)), path(CORONADO, true)].forEach(function (d) {
+  // Communities that sit out in the water (Coronado) are drawn above the sea instead of under it.
+  var gIsland = svgNS('g', {}, svg), islands = data.filter(function (d) { return d.i; });
+  [path(COAST.concat(BAY))].concat(islands.map(function (d) { return path(d.c, true); })).forEach(function (d) {
     svgNS('path', { d: d, fill: 'none', stroke: '#1b2a38', 'stroke-width': 2, 'vector-effect': 'non-scaling-stroke', 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }, svg);
   });
   var scaled = [];   // things drawn at a constant pixel size: [element, x, y]
@@ -103,7 +103,7 @@
 
   var cellEls = {}, labelEls = {}, areaLabelEls = {}, destEls = [], gEdges, selOutline;
   data.forEach(function (d) {
-    var el = svgNS('path', { 'class': 'hm-cell', d: path(d.c, true), fill: d.fill, stroke: d.fill, 'data-s': d.s, 'data-g': d.g, tabindex: -1, role: 'button', 'aria-label': d.n }, gCells);
+    var el = svgNS('path', { 'class': 'hm-cell', d: path(d.c, true), fill: d.fill, stroke: d.fill, 'data-s': d.s, 'data-g': d.g, tabindex: -1, role: 'button', 'aria-label': d.n }, d.i ? gIsland : gCells);
     el.addEventListener('click', function () { onCell(d); });
     el.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onCell(d); } });
     el.addEventListener('mouseenter', function () { onHover(d, true); });
