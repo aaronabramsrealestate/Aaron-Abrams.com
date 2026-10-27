@@ -16,6 +16,8 @@ PAGES
   investment.html       Investment and property potential
   neighborhoods.html    Interactive map and all community guides (one page per community)
   resources.html        Practical guides
+  services.html         PorchLight partners (31 Beaches, Goosehead, Home Warranty of America),
+                        vendor referrals, and selling as-is for a cash offer
   reviews.html          Verified testimonials (empty until reviews are approved)
   faq.html, contact.html, home-value.html, thank-you.html, 404.html
 
