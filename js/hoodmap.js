@@ -32,10 +32,12 @@
   function path(arr, close) { return arr.map(function (p, i) { var q = P(p[0], p[1]); return (i ? 'L' : 'M') + q[0].toFixed(1) + ' ' + q[1].toFixed(1); }).join('') + (close ? 'Z' : ''); }
 
   var COAST = [[33.43, -117.64], [33.385, -117.595], [33.35, -117.545], [33.31, -117.50], [33.27, -117.435], [33.235, -117.405], [33.215, -117.395], [33.195, -117.385], [33.18, -117.362], [33.16, -117.355], [33.145, -117.347], [33.12, -117.335], [33.09, -117.312], [33.07, -117.31], [33.04, -117.298], [33.015, -117.283], [32.99, -117.272], [32.96, -117.266], [32.93, -117.262], [32.90, -117.258], [32.86, -117.262], [32.852, -117.272], [32.83, -117.28], [32.81, -117.278], [32.795, -117.258], [32.77, -117.255], [32.75, -117.255], [32.735, -117.256], [32.70, -117.25], [32.668, -117.243]];
-  var CORONADO = [[32.69, -117.195], [32.675, -117.178], [32.64, -117.15], [32.60, -117.135], [32.565, -117.13], [32.53, -117.125]];
-  var BAY = [[32.672, -117.236], [32.70, -117.232], [32.716, -117.236], [32.72, -117.205], [32.714, -117.178], [32.70, -117.162], [32.67, -117.128], [32.64, -117.107], [32.612, -117.10], [32.598, -117.115], [32.602, -117.128], [32.632, -117.14], [32.66, -117.165], [32.682, -117.185], [32.683, -117.215]];
-  var MISSION_BAY = [[32.795, -117.255], [32.80, -117.238], [32.79, -117.222], [32.775, -117.222], [32.765, -117.235], [32.77, -117.252]];
-  var COVER = [[33.43, -117.33], [33.43, -116.98], [32.93, -116.98], [32.93, -117.05], [32.69, -117.05], [32.69, -117.35], [33.26, -117.50], [33.26, -117.33]];
+  // Coronado and North Island, drawn as land inside the bay.
+  var CORONADO = [[32.706, -117.226], [32.712, -117.205], [32.70, -117.172], [32.685, -117.16], [32.655, -117.148], [32.62, -117.133], [32.585, -117.122], [32.575, -117.118], [32.572, -117.126], [32.60, -117.135], [32.63, -117.145], [32.66, -117.165], [32.679, -117.178], [32.681, -117.20], [32.684, -117.222]];
+  // San Diego Bay shoreline, from the bay side of Point Loma around to the South Bay. The bay is drawn as part of
+  // the ocean, so the water flows past the tip of Point Loma the way the harbor entrance does.
+  var BAY = [[32.6706, -117.2379], [32.70, -117.232], [32.716, -117.236], [32.72, -117.205], [32.714, -117.178], [32.70, -117.162], [32.67, -117.128], [32.64, -117.107], [32.612, -117.10], [32.58, -117.095]];
+  var COVER = [[33.43, -117.33], [33.43, -116.98], [32.93, -116.98], [32.93, -117.05], [32.69, -117.05], [32.69, -117.228], [32.655, -117.228], [32.655, -117.35], [33.26, -117.50], [33.26, -117.33]];
   
 
   // Major destinations: [name, lat, lon, icon, shown on the full map, neighborhoods it is near, one line about it]
@@ -86,11 +88,10 @@
   svgNS('rect', { x: -W, y: -H, width: W * 3, height: H * 3, fill: '#ebe8e2' }, svg);
   var clip = svgNS('clipPath', { id: 'hmcover' }, defs); svgNS('path', { d: path(COVER, true) }, clip);
   var gCells = svgNS('g', { 'clip-path': 'url(#hmcover)' }, svg);
-  var oceanPts = [[34, -118.6]].concat(COAST).concat([[32.668, -117.243], [32.69, -117.195]]).concat(CORONADO).concat([[32.40, -117.125], [32.40, -118.6]]);
+  var oceanPts = [[34, -118.6]].concat(COAST).concat(BAY).concat([[32.40, -117.09], [32.40, -118.6]]);
   svgNS('path', { d: path(oceanPts, true), fill: 'url(#hmsea)' }, svg);
-  svgNS('path', { d: path(BAY, true), fill: '#8ccbea' }, svg);
-  svgNS('path', { d: path(MISSION_BAY, true), fill: '#8ccbea' }, svg);
-  [path(COAST), path(CORONADO), path(BAY, true), path(MISSION_BAY, true)].forEach(function (d) {
+  svgNS('path', { d: path(CORONADO, true), fill: '#ebe8e2' }, svg);
+  [path(COAST.concat(BAY)), path(CORONADO, true)].forEach(function (d) {
     svgNS('path', { d: d, fill: 'none', stroke: '#1b2a38', 'stroke-width': 2, 'vector-effect': 'non-scaling-stroke', 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }, svg);
   });
   var scaled = [];   // things drawn at a constant pixel size: [element, x, y]
