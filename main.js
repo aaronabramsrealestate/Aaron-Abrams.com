@@ -45,6 +45,11 @@ var LEAD_FORMS='form[name="contact"],form[name="home-value"]';
     track('generate_lead',{form_name:f.getAttribute('name'),interest:i?i.value:''});
   },true);
   window.addEventListener('pageshow',function(){ document.querySelectorAll(LEAD_FORMS).forEach(function(f){ f.__tracked=false; }); });
+  // Links with data-interest preselect that option in the page's contact form
+  document.addEventListener('click',function(e){
+    var a=e.target.closest&&e.target.closest('a[data-interest]'); if(!a) return;
+    var s=document.querySelector('form[name="contact"] [name="interest"]'); if(s) s.value=a.getAttribute('data-interest');
+  });
   // Calendly tells the page when a meeting is booked
   window.addEventListener('message',function(e){
     if(e.origin!=='https://calendly.com'||!e.data||e.data.event!=='calendly.event_scheduled') return;
